@@ -6,7 +6,7 @@ import apt_pkg
 cache = None
 type_recommends = 4
 
-def count_pkg_revdepends(pkg):
+def count_pkg_revdepends(pkg, maxcount):
 	global cache
 
 	rev_depends = 0
@@ -16,10 +16,14 @@ def count_pkg_revdepends(pkg):
 				(otherdep.dep_type_enum == apt_pkg.Dependency.TYPE_DEPENDS or \
 				otherdep.dep_type_enum == apt_pkg.Dependency.TYPE_PREDEPENDS):
 			rev_depends += 1
+			if rev_depends >= maxcount:
+				return rev_depends
 	if pkg.current_ver != None:
 	  for provided in pkg.current_ver.provides_list:
 		try:
-			rev_depends += count_pkg_revdepends(cache[provided[0]])
+			rev_depends += count_pkg_revdepends(cache[provided[0]], maxcount)
+			if rev_depends >= maxcount:
+				return rev_depends
 		except KeyError as e:
 			print "Package not found:",str(e).strip('"')
 
@@ -44,7 +48,7 @@ def dependencies(pkg, deps):
                         pkg.current_ver.depends_list.get("Depends", []):
 	for otherdep in or_group:
 		if is_available(otherdep.target_pkg) and \
-				count_pkg_revdepends(otherdep.target_pkg) == 1:
+				count_pkg_revdepends(otherdep.target_pkg, 2) == 1:
 			deps.add(otherdep.target_pkg.id)
 			dependencies(otherdep.target_pkg, deps)
     elif pkg.has_provides:
@@ -54,7 +58,7 @@ def dependencies(pkg, deps):
 		dependencies(provider[2].parent_pkg, deps)
 
 
-def count_pkg_revrecommends(pkg):
+def count_pkg_revrecommends(pkg, maxcount):
 	global type_recommends
 
 	deps = set()
@@ -67,6 +71,8 @@ def count_pkg_revrecommends(pkg):
 				otherdep.dep_type_enum == type_recommends and \
 				not otherdep.parent_pkg.id in deps:
 			rev_recommends += 1
+			if rev_recommends >= maxcount:
+				return rev_recommends
 	return rev_recommends
 
 def list_orphans(orphans):
@@ -75,8 +81,8 @@ def list_orphans(orphans):
 	for otherpkg in cache.packages:
 		if otherpkg.current_ver != None and not otherpkg.essential \
 						and not otherpkg.important:
-			if count_pkg_revdepends(otherpkg) == 0 and\
-					count_pkg_revrecommends(otherpkg) == 0:
+			if count_pkg_revdepends(otherpkg, 1) == 0 and\
+					count_pkg_revrecommends(otherpkg, 1) == 0:
 				orphans.append(otherpkg.name)
 
 if __name__ == '__main__':
