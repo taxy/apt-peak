@@ -47,18 +47,20 @@ def is_available(pkg):
 
 def dependencies(pkg, deps):
 
+    if pkg.id in deps:
+        return
+    deps.add(pkg.id)
+
     if pkg.current_ver != None:
         for or_group in pkg.current_ver.depends_list.get("PreDepends", []) + \
                 pkg.current_ver.depends_list.get("Depends", []):
             for otherdep in or_group:
                 if is_available(otherdep.target_pkg) and \
                                 count_pkg_revdepends(otherdep.target_pkg, 2, set()) == 1:
-                    deps.add(otherdep.target_pkg.id)
                     dependencies(otherdep.target_pkg, deps)
     elif pkg.has_provides:
         for provider in pkg.provides_list:
             if is_available(provider[2].parent_pkg):
-                deps.add(provider[2].parent_pkg.id)
                 dependencies(provider[2].parent_pkg, deps)
 
 
@@ -66,7 +68,6 @@ def count_pkg_revrecommends(pkg, maxcount):
         global type_recommends
 
         deps = set()
-        deps.add(pkg.id)
         dependencies(pkg, deps)
         rev_recommends = 0
         for otherdep in pkg.rev_depends_list:
