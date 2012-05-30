@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
+
 import sys
 import apt_pkg
 
@@ -93,18 +95,23 @@ def list_orphans(orphans):
 if __name__ == '__main__':
     apt_pkg.init()
 
-    if apt_pkg.VersionCompare(apt_pkg.VERSION, "0.8") < 0:
-        print "must use python-apt 0.8 or greater"
-        sys.exit()
+    try:
+        if apt_pkg.VersionCompare(apt_pkg.VERSION, "0.8") < 0:
+            print("Must use python-apt 0.8 or greater.")
+            sys.exit()
+    except AttributeError:
+        if apt_pkg.VERSION < "0.8":
+            print("Must use python-apt 0.8 or greater.")
+            sys.exit()
 
     if apt_pkg.Dependency.TYPE_RECOMMENDS != type_recommends:
-        print "PYTHON-APT BUG: apt_pkg.Dependency.TYPE_RECOMMENDS is not equal to 4"
+        print("PYTHON-APT BUG: apt_pkg.Dependency.TYPE_RECOMMENDS is not equal to 4")
 
     cache = apt_pkg.Cache()
 
-    print "List of orphan packages:"
+    print("List of orphan packages:")
     orphans = list()
     list_orphans(orphans)
     orphans.sort()
-    print "\n".join(orphans)
+    print("\n".join(orphans))
 
