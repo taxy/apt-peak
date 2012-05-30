@@ -6,7 +6,7 @@ import apt_pkg
 cache = None
 type_recommends = 4
 
-def count_pkg_revdepends(pkg, maxcount):
+def count_pkg_revdepends(pkg, maxcount, revdeps):
     global cache
 
     rev_depends = 0
@@ -15,13 +15,17 @@ def count_pkg_revdepends(pkg, maxcount):
                 otherdep.parent_pkg.current_ver.id == otherdep.parent_ver.id and \
                 (otherdep.dep_type_enum == apt_pkg.Dependency.TYPE_DEPENDS or \
                 otherdep.dep_type_enum == apt_pkg.Dependency.TYPE_PREDEPENDS):
+            revdeps.add(otherdep.parent_pkg.id)
             rev_depends += 1
             if rev_depends >= maxcount:
                 return rev_depends
     if pkg.current_ver != None:
         for provided in pkg.current_ver.provides_list:
             try:
-                rev_depends += count_pkg_revdepends(cache[provided[0]], maxcount)
+                provides_pkg = cache[provided[0]]
+                if not provides_pkg.id in revdeps:
+                    revdeps.add(provides_pkg.id)
+                    rev_depends += count_pkg_revdepends(provides_pkg, maxcount, revdeps)
                 if rev_depends >= maxcount:
                         return rev_depends
             except KeyError as e:
@@ -48,7 +52,7 @@ def dependencies(pkg, deps):
                 pkg.current_ver.depends_list.get("Depends", []):
             for otherdep in or_group:
                 if is_available(otherdep.target_pkg) and \
-                                count_pkg_revdepends(otherdep.target_pkg, 2) == 1:
+                                count_pkg_revdepends(otherdep.target_pkg, 2, set()) == 1:
                     deps.add(otherdep.target_pkg.id)
                     dependencies(otherdep.target_pkg, deps)
     elif pkg.has_provides:
@@ -81,7 +85,7 @@ def list_orphans(orphans):
         for otherpkg in cache.packages:
             if otherpkg.current_ver != None and not otherpkg.essential \
                                             and not otherpkg.important:
-                if count_pkg_revdepends(otherpkg, 1) == 0 and\
+                if count_pkg_revdepends(otherpkg, 1, set()) == 0 and\
                         count_pkg_revrecommends(otherpkg, 1) == 0:
                     orphans.append(otherpkg.name)
 
