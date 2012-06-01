@@ -8,32 +8,41 @@ import apt_pkg
 cache = None
 type_recommends = 4
 
-def count_pkg_revdepends(pkg, maxcount, revdeps):
-    global cache
+class RevdependsCounter:
 
-    rev_depends = 0
-    for otherdep in pkg.rev_depends_list:
-        if otherdep.parent_pkg.current_ver != None and \
-                otherdep.parent_pkg.current_ver.id == otherdep.parent_ver.id and \
-                (otherdep.dep_type_enum == apt_pkg.Dependency.TYPE_DEPENDS or \
-                otherdep.dep_type_enum == apt_pkg.Dependency.TYPE_PREDEPENDS):
-            revdeps.add(otherdep.parent_pkg.id)
-            rev_depends += 1
-            if rev_depends >= maxcount:
-                return rev_depends
-    if pkg.current_ver != None:
-        for provided in pkg.current_ver.provides_list:
-            try:
-                provides_pkg = cache[provided[0]]
-                if not provides_pkg.id in revdeps:
-                    revdeps.add(provides_pkg.id)
-                    rev_depends += count_pkg_revdepends(provides_pkg, maxcount, revdeps)
-                if rev_depends >= maxcount:
-                        return rev_depends
-            except KeyError as e:
-                print("Package not found:", str(e).strip('"'))
+    def count_pkg_revdepends(self, pkg, maxcount):
+        self.revdeps = set()
+        self.maxcount = maxcount
+        return self.count_pkg_revdepends_loop(pkg)
 
-    return rev_depends
+    def count_pkg_revdepends_loop(self, pkg):
+        global cache
+
+        rev_depends = 0
+        for otherdep in pkg.rev_depends_list:
+            if otherdep.parent_pkg.current_ver != None and \
+                    otherdep.parent_pkg.current_ver.id == otherdep.parent_ver.id and \
+                    (otherdep.dep_type_enum == apt_pkg.Dependency.TYPE_DEPENDS or \
+                    otherdep.dep_type_enum == apt_pkg.Dependency.TYPE_PREDEPENDS):
+                self.revdeps.add(otherdep.parent_pkg.id)
+                rev_depends += 1
+                if rev_depends >= self.maxcount:
+                    return rev_depends
+        if pkg.current_ver != None:
+            for provided in pkg.current_ver.provides_list:
+                try:
+                    provides_pkg = cache[provided[0]]
+                    if not provides_pkg.id in self.revdeps:
+                        self.revdeps.add(provides_pkg.id)
+                        rev_depends += self.count_pkg_revdepends_loop(provides_pkg)
+                    if rev_depends >= self.maxcount:
+                            return rev_depends
+                except KeyError as e:
+                    print("Package not found:", str(e).strip('"'))
+
+        return rev_depends
+
+rev_c = RevdependsCounter()
 
 def is_available(pkg):
     if not pkg.has_versions:
@@ -48,6 +57,7 @@ def is_available(pkg):
 
 
 def dependencies(pkg, deps):
+    global rev_c
 
     if pkg.id in deps:
         return
@@ -58,7 +68,7 @@ def dependencies(pkg, deps):
                 pkg.current_ver.depends_list.get("Depends", []):
             for otherdep in or_group:
                 if is_available(otherdep.target_pkg) and \
-                                count_pkg_revdepends(otherdep.target_pkg, 2, set()) == 1:
+                                rev_c.count_pkg_revdepends(otherdep.target_pkg, 2) == 1:
                     dependencies(otherdep.target_pkg, deps)
     elif pkg.has_provides:
         for provider in pkg.provides_list:
@@ -84,11 +94,12 @@ def count_pkg_revrecommends(pkg, maxcount):
 
 def list_orphans(orphans):
         global cache
+        global rev_c
 
         for otherpkg in cache.packages:
             if otherpkg.current_ver != None and not otherpkg.essential \
                                             and not otherpkg.important:
-                if count_pkg_revdepends(otherpkg, 1, set()) == 0 and\
+                if rev_c.count_pkg_revdepends(otherpkg, 1) == 0 and\
                         count_pkg_revrecommends(otherpkg, 1) == 0:
                     orphans.append(otherpkg.name)
 
