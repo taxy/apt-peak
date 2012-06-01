@@ -72,7 +72,7 @@ class CirclelessRevdependsCounter:
                     if is_available(otherdep.target_pkg) and \
                                     rev_c.count_pkg_revdepends(otherdep.target_pkg, 2) == 1:
                         self.dependencies(otherdep.target_pkg)
-        elif pkg.has_provides:
+        if pkg.has_provides:
             for provider in pkg.provides_list:
                 if is_available(provider[2].parent_pkg):
                     self.dependencies(provider[2].parent_pkg)
