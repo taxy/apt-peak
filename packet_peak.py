@@ -32,8 +32,9 @@ class RevdependsCounter:
                     (otherdep.dep_type_enum == apt_pkg.Dependency.TYPE_DEPENDS or \
                     otherdep.dep_type_enum == apt_pkg.Dependency.TYPE_PREDEPENDS) and \
                     not otherdep.parent_pkg.id in self.pkg_except:
-                self.revdeps.add(otherdep.parent_pkg.id)
-                rev_depends += 1
+                if not otherdep.parent_pkg.id in self.revdeps:
+                    self.revdeps.add(otherdep.parent_pkg.id)
+                    rev_depends += 1
                 if rev_depends >= self.maxcount:
                     return rev_depends
         if pkg.current_ver != None:
@@ -42,7 +43,11 @@ class RevdependsCounter:
                     provides_pkg = cache[provided[0]]
                     if not provides_pkg.id in self.revdeps:
                         self.revdeps.add(provides_pkg.id)
-                        rev_depends += self.count_pkg_revdepends_loop(provides_pkg)
+                        if provides_pkg.current_ver != None and \
+                                not provides_pkg.id in self.pkg_except:
+                            rev_depends += 1
+                        if not provides_pkg.has_versions:
+                            rev_depends += self.count_pkg_revdepends_loop(provides_pkg)
                     if rev_depends >= self.maxcount:
                             return rev_depends
                 except KeyError as e:
