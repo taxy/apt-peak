@@ -53,16 +53,7 @@ class RevdependsCounter:
 rev_c = RevdependsCounter()
 
 def is_available(pkg):
-    if not pkg.has_versions:
-        if pkg.has_provides:
-            return True
-        else:
-            return False
-    elif pkg.current_ver != None:
-        return True
-    else:
-        return False
-
+    return not (pkg.has_versions and pkg.current_ver == None)
 
 class CirclelessRevdependsCounter:
 
