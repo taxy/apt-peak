@@ -13,6 +13,13 @@ class RevdependsCounter:
     def count_pkg_revdepends(self, pkg, maxcount):
         self.revdeps = set()
         self.maxcount = maxcount
+        self.pkg_except = set()
+        return self.count_pkg_revdepends_loop(pkg)
+
+    def count_pkg_revdepends_except(self, pkg, maxcount, pkg_except):
+        self.revdeps = set()
+        self.maxcount = maxcount
+        self.pkg_except = pkg_except
         return self.count_pkg_revdepends_loop(pkg)
 
     def count_pkg_revdepends_loop(self, pkg):
@@ -23,7 +30,8 @@ class RevdependsCounter:
             if otherdep.parent_pkg.current_ver != None and \
                     otherdep.parent_pkg.current_ver.id == otherdep.parent_ver.id and \
                     (otherdep.dep_type_enum == apt_pkg.Dependency.TYPE_DEPENDS or \
-                    otherdep.dep_type_enum == apt_pkg.Dependency.TYPE_PREDEPENDS):
+                    otherdep.dep_type_enum == apt_pkg.Dependency.TYPE_PREDEPENDS) and \
+                    not otherdep.parent_pkg.id in self.pkg_except:
                 self.revdeps.add(otherdep.parent_pkg.id)
                 rev_depends += 1
                 if rev_depends >= self.maxcount:
@@ -70,7 +78,7 @@ class CirclelessRevdependsCounter:
                     pkg.current_ver.depends_list.get("Depends", []):
                 for otherdep in or_group:
                     if is_available(otherdep.target_pkg) and \
-                                    rev_c.count_pkg_revdepends(otherdep.target_pkg, 2) == 1:
+                                    rev_c.count_pkg_revdepends_except(otherdep.target_pkg, 1, self.deps) == 0:
                         self.dependencies(otherdep.target_pkg)
         if pkg.has_provides:
             for provider in pkg.provides_list:
