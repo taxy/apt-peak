@@ -56,51 +56,54 @@ def is_available(pkg):
         return False
 
 
-def dependencies(pkg, deps):
-    global rev_c
+class CirclelessRevdependsCounter:
 
-    if pkg.id in deps:
-        return
-    deps.add(pkg.id)
+    def dependencies(self, pkg):
+        global rev_c
 
-    if pkg.current_ver != None:
-        for or_group in pkg.current_ver.depends_list.get("PreDepends", []) + \
-                pkg.current_ver.depends_list.get("Depends", []):
-            for otherdep in or_group:
-                if is_available(otherdep.target_pkg) and \
-                                rev_c.count_pkg_revdepends(otherdep.target_pkg, 2) == 1:
-                    dependencies(otherdep.target_pkg, deps)
-    elif pkg.has_provides:
-        for provider in pkg.provides_list:
-            if is_available(provider[2].parent_pkg):
-                dependencies(provider[2].parent_pkg, deps)
+        if pkg.id in self.deps:
+            return
+        self.deps.add(pkg.id)
+
+        if pkg.current_ver != None:
+            for or_group in pkg.current_ver.depends_list.get("PreDepends", []) + \
+                    pkg.current_ver.depends_list.get("Depends", []):
+                for otherdep in or_group:
+                    if is_available(otherdep.target_pkg) and \
+                                    rev_c.count_pkg_revdepends(otherdep.target_pkg, 2) == 1:
+                        self.dependencies(otherdep.target_pkg)
+        elif pkg.has_provides:
+            for provider in pkg.provides_list:
+                if is_available(provider[2].parent_pkg):
+                    self.dependencies(provider[2].parent_pkg)
 
 
-def count_pkg_revrecommends(pkg, maxcount):
-        global type_recommends
+    def count_pkg_revrecommends(self, pkg, maxcount):
+            global type_recommends
 
-        deps = set()
-        dependencies(pkg, deps)
-        rev_recommends = 0
-        for otherdep in pkg.rev_depends_list:
-            if otherdep.parent_pkg.current_ver != None and \
-                    otherdep.parent_pkg.current_ver.id == otherdep.parent_ver.id and \
-                    otherdep.dep_type_enum == type_recommends and \
-                    not otherdep.parent_pkg.id in deps:
-                rev_recommends += 1
-                if rev_recommends >= maxcount:
-                    return rev_recommends
-        return rev_recommends
+            self.deps = set()
+            self.dependencies(pkg)
+            rev_recommends = 0
+            for otherdep in pkg.rev_depends_list:
+                if otherdep.parent_pkg.current_ver != None and \
+                        otherdep.parent_pkg.current_ver.id == otherdep.parent_ver.id and \
+                        otherdep.dep_type_enum == type_recommends and \
+                        not otherdep.parent_pkg.id in self.deps:
+                    rev_recommends += 1
+                    if rev_recommends >= maxcount:
+                        return rev_recommends
+            return rev_recommends
 
 def list_orphans(orphans):
         global cache
         global rev_c
+        crev_c = CirclelessRevdependsCounter()
 
         for otherpkg in cache.packages:
             if otherpkg.current_ver != None and not otherpkg.essential \
                                             and not otherpkg.important:
                 if rev_c.count_pkg_revdepends(otherpkg, 1) == 0 and\
-                        count_pkg_revrecommends(otherpkg, 1) == 0:
+                        crev_c.count_pkg_revrecommends(otherpkg, 1) == 0:
                     orphans.append(otherpkg.name)
 
 if __name__ == '__main__':
