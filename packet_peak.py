@@ -11,13 +11,11 @@ type_recommends = 4
 class RevdependsCounter:
 
     def count_pkg_revdepends(self, pkg, maxcount):
-        self.revdeps = set()
         self.maxcount = maxcount
         self.pkg_except = set()
         return self.count_pkg_revdepends_loop(pkg)
 
     def count_pkg_revdepends_except(self, pkg, maxcount, pkg_except):
-        self.revdeps = set()
         self.maxcount = maxcount
         self.pkg_except = pkg_except
         return self.count_pkg_revdepends_loop(pkg)
@@ -32,22 +30,18 @@ class RevdependsCounter:
                     (otherdep.dep_type_enum == apt_pkg.Dependency.TYPE_DEPENDS or \
                     otherdep.dep_type_enum == apt_pkg.Dependency.TYPE_PREDEPENDS) and \
                     not otherdep.parent_pkg.id in self.pkg_except:
-                if not otherdep.parent_pkg.id in self.revdeps:
-                    self.revdeps.add(otherdep.parent_pkg.id)
-                    rev_depends += 1
+                rev_depends += 1
                 if rev_depends >= self.maxcount:
                     return rev_depends
         if pkg.current_ver != None:
             for provided in pkg.current_ver.provides_list:
                 try:
                     provides_pkg = cache[provided[0]]
-                    if not provides_pkg.id in self.revdeps:
-                        self.revdeps.add(provides_pkg.id)
-                        if provides_pkg.current_ver != None and \
-                                not provides_pkg.id in self.pkg_except:
-                            rev_depends += 1
-                        if not provides_pkg.has_versions:
-                            rev_depends += self.count_pkg_revdepends_loop(provides_pkg)
+                    if provides_pkg.current_ver != None and \
+                            not provides_pkg.id in self.pkg_except:
+                        rev_depends += 1
+                    if not provides_pkg.has_versions:
+                        rev_depends += self.count_pkg_revdepends_loop(provides_pkg)
                     if rev_depends >= self.maxcount:
                             return rev_depends
                 except KeyError as e:
