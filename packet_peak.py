@@ -102,7 +102,7 @@ def list_orphans(orphans):
                                             and not otherpkg.important:
                 if rev_c.count_pkg_revdepends(otherpkg, 1) == 0 and\
                         crev_c.count_pkg_revrecommends(otherpkg, 1) == 0:
-                    orphans.append(otherpkg.name)
+                    orphans.append(otherpkg.get_fullname(True))
 
 if __name__ == '__main__':
     apt_pkg.init()
