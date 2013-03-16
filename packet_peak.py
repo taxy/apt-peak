@@ -106,19 +106,19 @@ if __name__ == '__main__':
 
     try:
         if apt_pkg.VersionCompare(apt_pkg.VERSION, "0.8") < 0:
-            print("Must use python-apt 0.8 or greater.")
+            print("Must use python-apt 0.8 or greater.", file=sys.stderr)
             sys.exit()
     except AttributeError:
         if apt_pkg.VERSION < "0.8":
-            print("Must use python-apt 0.8 or greater.")
+            print("Must use python-apt 0.8 or greater.", file=sys.stderr)
             sys.exit()
 
     if apt_pkg.Dependency.TYPE_RECOMMENDS != type_recommends:
-        print("PYTHON-APT BUG: apt_pkg.Dependency.TYPE_RECOMMENDS is not equal to 4")
+        print("PYTHON-APT BUG: apt_pkg.Dependency.TYPE_RECOMMENDS is not equal to 4", file=sys.stderr)
 
-    cache = apt_pkg.Cache()
+    cache = apt_pkg.Cache(None)
 
-    print("List of orphan packages:")
+    print("List of peak packages:", file=sys.stderr)
     orphans = list()
     list_orphans(orphans)
     orphans.sort()
