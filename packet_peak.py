@@ -37,10 +37,7 @@ class RevdependsCounter:
             for provided in pkg.current_ver.provides_list:
                 try:
                     provides_pkg = cache[provided[0]]
-                    if provides_pkg.current_ver != None and \
-                            not provides_pkg.id in self.pkg_except:
-                        rev_depends += 1
-                    if not provides_pkg.has_versions:
+                    if provides_pkg.current_ver == None:
                         rev_depends += self.count_pkg_revdepends_loop(provides_pkg)
                     if rev_depends >= self.maxcount:
                             return rev_depends
@@ -52,7 +49,7 @@ class RevdependsCounter:
 rev_c = RevdependsCounter()
 
 def is_available(pkg):
-    return not (pkg.has_versions and pkg.current_ver == None)
+    return pkg.has_provides or pkg.current_ver != None
 
 class CirclelessRevdependsCounter:
 
