@@ -5,10 +5,12 @@ from __future__ import print_function
 import sys
 import apt_pkg
 
-cache = None
 type_recommends = 4
 
 class RevdependsCounter:
+
+    def __init__(self, cache):
+        self.cache = cache
 
     def count_pkg_revdepends(self, pkg, maxcount):
         self.maxcount = maxcount
@@ -21,7 +23,6 @@ class RevdependsCounter:
         return self.count_pkg_revdepends_loop(pkg)
 
     def count_pkg_revdepends_loop(self, pkg):
-        global cache
 
         rev_depends = 0
         for otherdep in pkg.rev_depends_list:
@@ -36,7 +37,7 @@ class RevdependsCounter:
         if pkg.current_ver != None:
             for provided in pkg.current_ver.provides_list:
                 try:
-                    provides_pkg = cache[provided[0]]
+                    provides_pkg = self.cache[provided[0]]
                     if provides_pkg.current_ver == None:
                         rev_depends += self.count_pkg_revdepends_loop(provides_pkg)
                     if rev_depends >= self.maxcount:
@@ -90,10 +91,9 @@ class CirclelessRevdependsCounter:
                         return rev_recommends
             return rev_recommends
 
-def list_orphans(orphans):
-        global cache
+def list_orphans(orphans, cache):
 
-        rev_c = RevdependsCounter()
+        rev_c = RevdependsCounter(cache)
         crev_c = CirclelessRevdependsCounter(rev_c)
 
         for otherpkg in cache.packages:
@@ -122,7 +122,7 @@ if __name__ == '__main__':
 
     print("List of peak packages:", file=sys.stderr)
     orphans = list()
-    list_orphans(orphans)
+    list_orphans(orphans, cache)
     orphans.sort()
     print("\n".join(orphans))
 
