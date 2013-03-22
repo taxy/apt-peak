@@ -46,15 +46,16 @@ class RevdependsCounter:
 
         return rev_depends
 
-rev_c = RevdependsCounter()
 
 def is_available(pkg):
     return pkg.has_provides or pkg.current_ver != None
 
 class CirclelessRevdependsCounter:
 
+    def __init__(self, rev_c):
+        self.rev_c = rev_c
+
     def dependencies(self, pkg):
-        global rev_c
 
         if pkg.id in self.deps:
             return
@@ -65,7 +66,7 @@ class CirclelessRevdependsCounter:
                     pkg.current_ver.depends_list.get("Depends", []):
                 for otherdep in or_group:
                     if is_available(otherdep.target_pkg) and \
-                                    rev_c.count_pkg_revdepends_except(otherdep.target_pkg, 1, self.deps) == 0:
+                                    self.rev_c.count_pkg_revdepends_except(otherdep.target_pkg, 1, self.deps) == 0:
                         self.dependencies(otherdep.target_pkg)
         if pkg.has_provides:
             for provider in pkg.provides_list:
@@ -91,8 +92,9 @@ class CirclelessRevdependsCounter:
 
 def list_orphans(orphans):
         global cache
-        global rev_c
-        crev_c = CirclelessRevdependsCounter()
+
+        rev_c = RevdependsCounter()
+        crev_c = CirclelessRevdependsCounter(rev_c)
 
         for otherpkg in cache.packages:
             if otherpkg.current_ver != None and not otherpkg.essential \
