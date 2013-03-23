@@ -10,20 +10,6 @@ from peak_common import CirclelessRevdependsCounter
 
 type_recommends = 4
 
-def list_orphans(orphans, cache):
-
-
-        for otherpkg in cache.packages:
-            if otherpkg.current_ver != None and not otherpkg.essential \
-                                            and not otherpkg.important:
-                if rev_c.count_pkg_revdepends(otherpkg, 1) == 0 and\
-                        crev_c.count_pkg_revrecommends(otherpkg, 1) == 0:
-                    orphans.append(otherpkg.get_fullname(True))
-
-def dump(obj):
-  for attr in dir(obj):
-      print("obj.%s = %s" % (attr, getattr(obj, attr)))
-
 def multi_arg(option, opt_str, value, parser):
     if getattr(parser.values, option.dest) == None:
         setattr(parser.values, option.dest, list())
@@ -36,7 +22,6 @@ def identify_packages(pkg_names, cache, pkgs):
             pkgs.append(cache[pkg_name])
         except KeyError as e:
             print("Package not found:", str(e).strip('"'))
-
 
 def packages_parse(argv, cache, remove, keep):
     parser = OptionParser(usage="Usage: %prog -r package_list [-k package_list]")
@@ -80,7 +65,4 @@ if __name__ == '__main__':
     crev_c = CirclelessRevdependsCounter(rev_c)
 
 #    print("List of peak packages:", file=sys.stderr)
-#    orphans = list()
-#    list_orphans(orphans, cache)
-#    orphans.sort()
 #    print("\n".join(orphans))
