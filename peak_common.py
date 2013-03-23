@@ -10,6 +10,10 @@ class RevdependsCounter:
 
     def __init__(self, cache):
         self.cache = cache
+        self.removed = None
+
+    def installed(self, pkg):
+        return pkg.current_ver != None and (self.removed == None or not pkg.id in self.removed)
 
     def count_pkg_revdepends(self, pkg, maxcount):
         self.maxcount = maxcount
@@ -25,7 +29,7 @@ class RevdependsCounter:
 
         rev_depends = 0
         for otherdep in pkg.rev_depends_list:
-            if otherdep.parent_pkg.current_ver != None and \
+            if self.installed(otherdep.parent_pkg) and \
                     otherdep.parent_pkg.current_ver.id == otherdep.parent_ver.id and \
                     (otherdep.dep_type_enum == apt_pkg.Dependency.TYPE_DEPENDS or \
                     otherdep.dep_type_enum == apt_pkg.Dependency.TYPE_PREDEPENDS) and \
@@ -33,11 +37,11 @@ class RevdependsCounter:
                 rev_depends += 1
                 if rev_depends >= self.maxcount:
                     return rev_depends
-        if pkg.current_ver != None:
+        if self.installed(pkg):
             for provided in pkg.current_ver.provides_list:
                 try:
                     provides_pkg = self.cache[provided[0]]
-                    if provides_pkg.current_ver == None:
+                    if not self.installed(provides_pkg):
                         rev_depends += self.count_pkg_revdepends_loop(provides_pkg)
                     if rev_depends >= self.maxcount:
                             return rev_depends
@@ -46,14 +50,13 @@ class RevdependsCounter:
 
         return rev_depends
 
-
-def is_available(pkg):
-    return pkg.has_provides or pkg.current_ver != None
-
 class CirclelessRevdependsCounter:
 
     def __init__(self, rev_c):
         self.rev_c = rev_c
+
+    def is_available(self, pkg):
+        return pkg.has_provides or self.rev_c.installed(pkg)
 
     def dependencies(self, pkg):
 
@@ -61,16 +64,16 @@ class CirclelessRevdependsCounter:
             return
         self.deps.add(pkg.id)
 
-        if pkg.current_ver != None:
+        if self.rev_c.installed(pkg):
             for or_group in pkg.current_ver.depends_list.get("PreDepends", []) + \
                     pkg.current_ver.depends_list.get("Depends", []):
                 for otherdep in or_group:
-                    if is_available(otherdep.target_pkg) and \
+                    if self.is_available(otherdep.target_pkg) and \
                                     self.rev_c.count_pkg_revdepends_except(otherdep.target_pkg, 1, self.deps) == 0:
                         self.dependencies(otherdep.target_pkg)
         if pkg.has_provides:
             for provider in pkg.provides_list:
-                if is_available(provider[2].parent_pkg):
+                if self.is_available(provider[2].parent_pkg):
                     self.dependencies(provider[2].parent_pkg)
 
 
@@ -81,7 +84,7 @@ class CirclelessRevdependsCounter:
             self.dependencies(pkg)
             rev_recommends = 0
             for otherdep in pkg.rev_depends_list:
-                if otherdep.parent_pkg.current_ver != None and \
+                if self.rev_c.installed(otherdep.parent_pkg) and \
                         otherdep.parent_pkg.current_ver.id == otherdep.parent_ver.id and \
                         otherdep.dep_type_enum == type_recommends and \
                         not otherdep.parent_pkg.id in self.deps:
