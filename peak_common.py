@@ -15,6 +15,12 @@ class RevdependsCounter:
     def installed(self, pkg):
         return pkg.current_ver != None and (self.removed == None or not pkg.id in self.removed)
 
+    def simulation_mode_on(self):
+        self.removed = set()
+
+    def simulated_remove(self, pkg):
+        self.removed.add(pkg.id)
+
     def count_pkg_revdepends(self, pkg, maxcount):
         self.maxcount = maxcount
         self.pkg_except = set()
