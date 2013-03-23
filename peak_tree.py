@@ -12,8 +12,6 @@ type_recommends = 4
 
 def list_orphans(orphans, cache):
 
-        rev_c = RevdependsCounter(cache)
-        crev_c = CirclelessRevdependsCounter(rev_c)
 
         for otherpkg in cache.packages:
             if otherpkg.current_ver != None and not otherpkg.essential \
@@ -77,7 +75,10 @@ if __name__ == '__main__':
     remove = list()
     keep = list()
     packages_parse(sys.argv[1:], cache, remove, keep)
-    print("Remove:", remove, "\nKeep:", keep)
+    rev_c = RevdependsCounter(cache)
+    rev_c.simulation_mode_on()
+    crev_c = CirclelessRevdependsCounter(rev_c)
+
 #    print("List of peak packages:", file=sys.stderr)
 #    orphans = list()
 #    list_orphans(orphans, cache)
