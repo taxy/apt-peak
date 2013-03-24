@@ -66,6 +66,10 @@ class CirclelessRevdependsCounter:
 
     def dependency_version(self, pkg):
         if self.rev_c.installed(pkg):
+            if pkg.id in self.deps:
+                return
+            self.deps.add(pkg.id)
+
             for or_group in pkg.current_ver.depends_list.get("PreDepends", []) + \
                     pkg.current_ver.depends_list.get("Depends", []):
                 for otherdep in or_group:
@@ -76,14 +80,11 @@ class CirclelessRevdependsCounter:
     def dependency_provides(self, pkg):
         if pkg.has_provides:
             for provider in pkg.provides_list:
-                if self.is_available(provider[2].parent_pkg):
+                if self.rev_c.installed(provider[2].parent_pkg) and\
+                        provider[2].parent_pkg.current_ver.id == provider[2].id:
                     self.dependency_version(provider[2].parent_pkg)
 
     def dependencies(self, pkg):
-        if pkg.id in self.deps:
-            return
-        self.deps.add(pkg.id)
-
         self.dependency_version(pkg)
         self.dependency_provides(pkg)
 
