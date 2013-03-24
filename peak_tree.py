@@ -40,6 +40,40 @@ def packages_parse(argv, cache, remove, keep):
     if options.keep != None:
         identify_packages(options.keep, cache, keep)
 
+def add_providers(target_pkg, related_ids, related_pkgs):
+    if target_pkg.has_provides:
+        for provider in pkg.provides_list:
+            if not provider[2].parent_pkg.id in related_ids and\
+                    provider[2].parent_pkg.current_ver != None and\
+                    provider[2].parent_pkg.current_ver.id == provider[2].id:
+                related_ids.add(provider[2].parent_pkg.id)
+                related_pkgs.append(provider[2].parent_pkg)
+
+
+def collect_all_related_pkgs(remove, related_pkgs):
+    related_ids = set()
+    for pkg in remove:
+        if pkg.current_ver != None:
+            for or_group in pkg.current_ver.depends_list.get("PreDepends", []) + \
+                    pkg.current_ver.depends_list.get("Depends", []) + \
+                    pkg.current_ver.depends_list.get("Recommends", []):
+                for otherdep in or_group:
+                    if not otherdep.target_pkg.id in related_ids:
+                        if otherdep.target_pkg.current_ver != None:
+                            related_ids.add(otherdep.target_pkg.id)
+                            related_pkgs.append(otherdep.target_pkg)
+                        else:
+                            add_providers(otherdep.target_pkg, related_ids, related_pkgs)
+
+
+def collect_is_peak(related_pkgs, removable_ids, rev_c, crev_c, remove):
+    for otherpkg in related_pkgs:
+        if not otherpkg.id in removable_ids and\
+                rev_c.count_pkg_revdepends(otherpkg, 1) == 0 and\
+                crev_c.count_pkg_revrecommends(otherpkg, 1) == 0:
+            remove.append(otherpkg)
+
+
 if __name__ == '__main__':
     apt_pkg.init()
 
@@ -64,5 +98,24 @@ if __name__ == '__main__':
     rev_c.simulation_mode_on()
     crev_c = CirclelessRevdependsCounter(rev_c)
 
-#    print("List of peak packages:", file=sys.stderr)
-#    print("\n".join(orphans))
+    removable = list()
+    removable_ids = set()
+    for pkg in remove:
+        rev_c.simulated_remove(pkg)
+        removable_ids.add(pkg.id)
+        removable.append(pkg.get_fullname(True))
+
+    related_pkgs = list()
+
+    while len(remove) > 0:
+        collect_all_related_pkgs(remove, related_pkgs)
+        del remove[:]
+        collect_is_peak(related_pkgs, removable_ids, rev_c, crev_c, remove)
+        del related_pkgs[:]
+        for pkg in remove:
+            rev_c.simulated_remove(pkg)
+            removable_ids.add(pkg.id)
+            removable.append(pkg.get_fullname(True))
+
+    print("List of removable packages:", file=sys.stderr)
+    print(" ".join(removable))
