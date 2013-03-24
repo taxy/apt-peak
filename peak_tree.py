@@ -100,6 +100,8 @@ if __name__ == '__main__':
 
     removable = list()
     removable_ids = set()
+    for k_pkg in keep:
+        removable_ids.add(k_pkg.id)
     for pkg in remove:
         rev_c.simulated_remove(pkg)
         removable_ids.add(pkg.id)
