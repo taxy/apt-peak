@@ -11,6 +11,15 @@ class RevdependsCounter:
     def __init__(self, cache):
         self.cache = cache
         self.removed = None
+        self.verbose = False
+        self.verboseprint = lambda *a, **k: None
+
+    def set_verbose(self, verbose):
+        self.verbose = verbose
+        self.set_verboseprint(verbose)
+
+    def set_verboseprint(self, verbose):
+        self.verboseprint = print if verbose else lambda *a, **k: None
 
     def installed(self, pkg):
         return pkg.current_ver != None and (self.removed == None or not pkg.id in self.removed)
@@ -33,6 +42,7 @@ class RevdependsCounter:
 
     def count_pkg_revdepends_loop(self, pkg):
 
+        self.verboseprint("Revdeps:", pkg.get_fullname(True))
         rev_depends = 0
         for otherdep in pkg.rev_depends_list:
             if self.installed(otherdep.parent_pkg) and \
@@ -42,12 +52,14 @@ class RevdependsCounter:
                     not otherdep.parent_pkg.id in self.pkg_except:
                 rev_depends += 1
                 if rev_depends >= self.maxcount:
+                    self.verboseprint("Found revdep:", otherdep.parent_pkg.get_fullname(True))
                     return rev_depends
         if self.installed(pkg):
             for provided in pkg.current_ver.provides_list:
                 try:
                     provides_pkg = self.cache[provided[0]]
                     if not self.installed(provides_pkg):
+                        self.verboseprint("Found provide:", provides_pkg.get_fullname(True))
                         rev_depends += self.count_pkg_revdepends_loop(provides_pkg)
                     if rev_depends >= self.maxcount:
                             return rev_depends
@@ -91,8 +103,11 @@ class CirclelessRevdependsCounter:
     def count_pkg_revrecommends(self, pkg, maxcount):
             global type_recommends
 
+            self.rev_c.verboseprint("Revrecomms:", pkg.get_fullname(True))
+            self.rev_c.set_verboseprint(False)
             self.deps = set()
             self.dependencies(pkg)
+            self.rev_c.set_verboseprint(self.rev_c.verbose)
             rev_recommends = 0
             for otherdep in pkg.rev_depends_list:
                 if self.rev_c.installed(otherdep.parent_pkg) and \
@@ -101,5 +116,6 @@ class CirclelessRevdependsCounter:
                         not otherdep.parent_pkg.id in self.deps:
                     rev_recommends += 1
                     if rev_recommends >= maxcount:
+                        self.rev_c.verboseprint("Found revrecomm:", otherdep.parent_pkg.get_fullname(True))
                         return rev_recommends
             return rev_recommends
