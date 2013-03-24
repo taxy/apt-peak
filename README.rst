@@ -29,3 +29,16 @@ Example to use::
 
     ./package_peak.py > current.list
     diff -u my_confirmed_packages.list current.list
+
+peak-tree
+----------
+
+Collect removable dependency tree if you want remove peak packets.
+
+Example to use::
+
+    $ ./peak_tree.py -r gstreamer0.10-ffmpeg gstreamer0.10-plugins-ugly
+    List of removable packages:
+    gstreamer0.10-ffmpeg gstreamer0.10-plugins-ugly libpostproc51 libswscale0 libid3tag0 libmpeg2-4 libopencore-amrwb0 libsidplay1 libtwolame0 libavutil50
+
+    $ sudo apt-get purge gstreamer0.10-ffmpeg gstreamer0.10-plugins-ugly libpostproc51 libswscale0 libid3tag0 libmpeg2-4 libopencore-amrwb0 libsidplay1 libtwolame0 libavutil50
