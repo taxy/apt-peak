@@ -104,18 +104,26 @@ class CirclelessRevdependsCounter:
             global type_recommends
 
             self.rev_c.verboseprint("Revrecomms:", pkg.get_fullname(True))
+            rev_recommends = 0
+            pre_rev_recommends = list()
+            for otherdep in pkg.rev_depends_list:
+                if self.rev_c.installed(otherdep.parent_pkg) and \
+                        otherdep.parent_pkg.current_ver.id == otherdep.parent_ver.id and \
+                        otherdep.dep_type_enum == type_recommends:
+                    pre_rev_recommends.append(otherdep.parent_pkg)
+
+            if len(pre_rev_recommends) == 0:
+                return rev_recommends
+
             self.rev_c.set_verboseprint(False)
             self.deps = set()
             self.dependencies(pkg)
             self.rev_c.set_verboseprint(self.rev_c.verbose)
-            rev_recommends = 0
-            for otherdep in pkg.rev_depends_list:
-                if self.rev_c.installed(otherdep.parent_pkg) and \
-                        otherdep.parent_pkg.current_ver.id == otherdep.parent_ver.id and \
-                        otherdep.dep_type_enum == type_recommends and \
-                        not otherdep.parent_pkg.id in self.deps:
+
+            for revd_pkg in pre_rev_recommends:
+                if not revd_pkg.id in self.deps:
                     rev_recommends += 1
                     if rev_recommends >= maxcount:
-                        self.rev_c.verboseprint("Found revrecomm:", otherdep.parent_pkg.get_fullname(True))
+                        self.rev_c.verboseprint("Found revrecomm:", revd_pkg.get_fullname(True))
                         return rev_recommends
             return rev_recommends
