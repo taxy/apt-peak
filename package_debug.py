@@ -4,18 +4,9 @@ from __future__ import print_function
 
 import sys
 import apt_pkg
-from peak_common import RevdependsCounter
-from peak_common import CirclelessRevdependsCounter
+from peak_common import Peak
 
 type_recommends = 4
-
-def list_orphans(orphans, cache):
-
-
-        for otherpkg in cache.packages:
-            if otherpkg.current_ver != None and not otherpkg.essential \
-                                            and not otherpkg.important:
-                    orphans.append(otherpkg.get_fullname(True))
 
 if __name__ == '__main__':
     apt_pkg.init()
@@ -35,11 +26,9 @@ if __name__ == '__main__':
     cache = apt_pkg.Cache(None)
 
     test_pkg = cache[sys.argv[1]]
-    rev_c = RevdependsCounter(cache)
-    rev_c.set_verbose(True)
-    crev_c = CirclelessRevdependsCounter(rev_c)
-    if rev_c.count_pkg_revdepends(test_pkg, 1) == 0 and\
-            crev_c.count_pkg_revrecommends(test_pkg, 1) == 0:
+    peak = Peak(cache)
+    peak.set_verbose(True)
+    if peak.is_peak(test_pkg):
         print("Peak package.")
     else:
         print("Not peak package.")
