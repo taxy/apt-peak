@@ -5,8 +5,7 @@ from __future__ import print_function
 import sys
 import apt_pkg
 from optparse import OptionParser
-from peak_common import RevdependsCounter
-from peak_common import CirclelessRevdependsCounter
+from peak_common import Peak
 
 type_recommends = 4
 
@@ -66,11 +65,10 @@ def collect_all_related_pkgs(remove, related_pkgs):
                             add_providers(otherdep.target_pkg, related_ids, related_pkgs)
 
 
-def collect_is_peak(related_pkgs, removable_ids, rev_c, crev_c, remove):
+def collect_is_peak(related_pkgs, removable_ids, peak, remove):
     for otherpkg in related_pkgs:
         if not otherpkg.id in removable_ids and\
-                rev_c.count_pkg_revdepends(otherpkg, 1) == 0 and\
-                crev_c.count_pkg_revrecommends(otherpkg, 1) == 0:
+                peak.is_peak(otherpkg):
             remove.append(otherpkg)
 
 
@@ -94,16 +92,15 @@ if __name__ == '__main__':
     remove = list()
     keep = list()
     packages_parse(sys.argv[1:], cache, remove, keep)
-    rev_c = RevdependsCounter(cache)
-    rev_c.simulation_mode_on()
-    crev_c = CirclelessRevdependsCounter(rev_c)
+    peak = Peak(cache)
+    peak.simulation_mode_on()
 
     removable = list()
     removable_ids = set()
     for k_pkg in keep:
         removable_ids.add(k_pkg.id)
     for pkg in remove:
-        rev_c.simulated_remove(pkg)
+        peak.simulated_remove(pkg)
         removable_ids.add(pkg.id)
         removable.append(pkg.get_fullname(True))
 
@@ -112,10 +109,10 @@ if __name__ == '__main__':
     while len(remove) > 0:
         collect_all_related_pkgs(remove, related_pkgs)
         del remove[:]
-        collect_is_peak(related_pkgs, removable_ids, rev_c, crev_c, remove)
+        collect_is_peak(related_pkgs, removable_ids, peak, remove)
         del related_pkgs[:]
         for pkg in remove:
-            rev_c.simulated_remove(pkg)
+            peak.simulated_remove(pkg)
             removable_ids.add(pkg.id)
             removable.append(pkg.get_fullname(True))
 
