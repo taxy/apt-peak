@@ -67,7 +67,7 @@ class Peak:
 
         self.verboseprint("Revrecommends:", pkg.get_fullname(True))
         for otherdep in pkg.rev_depends_list:
-            if self.rev_c.installed(otherdep.parent_pkg) and \
+            if self.installed(otherdep.parent_pkg) and \
                     otherdep.parent_pkg.current_ver.id == otherdep.parent_ver.id and \
                     otherdep.dep_type_enum == type_recommends:
                 self.verboseprint("\t", otherdep.parent_pkg.get_fullname(True))
