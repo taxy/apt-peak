@@ -105,6 +105,8 @@ class Peak:
                 if self.installed(otherdep.target_pkg):
                     if not self.has_revdepends_loop(otherdep.target_pkg):
                         self.dependency_version(otherdep.target_pkg)
+                    else:
+                        self.deps[otherdep.target_pkg.id] = False
                 self.dependency_provides(otherdep.target_pkg)
 
     def dependency_provides(self, pkg):
