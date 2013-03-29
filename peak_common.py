@@ -124,11 +124,14 @@ class Peak:
 
     def is_peak(self, pkg):
         if pkg.essential or pkg.important:
+            self.verboseprint("Package is important:", pkg.get_fullname(True))
             return False
         if not self.installed(pkg):
+            self.verboseprint("Package is not installed:", pkg.get_fullname(True))
             return False
         if not (pkg.current_ver.priority == apt_pkg.PRI_OPTIONAL or\
                  pkg.current_ver.priority == apt_pkg.PRI_EXTRA):
+            self.verboseprint("Package is not optional:", pkg.get_fullname(True))
             return False
 
         if self.has_revdeps_without_provides(pkg):
