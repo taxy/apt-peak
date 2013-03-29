@@ -123,6 +123,12 @@ class Peak:
 
 
     def is_peak(self, pkg):
+        if not self.installed(pkg):
+            return False
+        if not (pkg.current_ver.priority == apt_pkg.PRI_OPTIONAL or\
+                 pkg.current_ver.priority == apt_pkg.PRI_EXTRA):
+            return False
+
         if self.has_revdeps_without_provides(pkg):
             return False
         self.provided_revdeps = list()
