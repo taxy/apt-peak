@@ -95,7 +95,6 @@ class Peak:
         return False
 
     def dependency_version(self, pkg):
-        if self.installed(pkg):
             if pkg.id in self.deps:
                 return
             self.deps.add(pkg.id)
@@ -116,7 +115,8 @@ class Peak:
                     self.dependency_version(provider[2].parent_pkg)
 
     def dependencies(self, pkg):
-        self.dependency_version(pkg)
+        if self.installed(pkg):
+            self.dependency_version(pkg)
         self.dependency_provides(pkg)
 
 
