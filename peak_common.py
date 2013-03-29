@@ -95,17 +95,17 @@ class Peak:
         return False
 
     def dependency_version(self, pkg):
-            if pkg.id in self.deps:
-                return
-            self.deps.add(pkg.id)
+        if pkg.id in self.deps:
+            return
+        self.deps.add(pkg.id)
 
-            for or_group in pkg.current_ver.depends_list.get("PreDepends", []) + \
-                    pkg.current_ver.depends_list.get("Depends", []):
-                for otherdep in or_group:
-                    if self.installed(otherdep.target_pkg):
-                        if not self.has_revdepends_loop(otherdep.target_pkg):
-                            self.dependency_version(otherdep.target_pkg)
-                    self.dependency_provides(otherdep.target_pkg)
+        for or_group in pkg.current_ver.depends_list.get("PreDepends", []) + \
+                pkg.current_ver.depends_list.get("Depends", []):
+            for otherdep in or_group:
+                if self.installed(otherdep.target_pkg):
+                    if not self.has_revdepends_loop(otherdep.target_pkg):
+                        self.dependency_version(otherdep.target_pkg)
+                self.dependency_provides(otherdep.target_pkg)
 
     def dependency_provides(self, pkg):
         if pkg.has_provides:
