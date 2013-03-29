@@ -123,6 +123,8 @@ class Peak:
 
 
     def is_peak(self, pkg):
+        if pkg.essential or pkg.important:
+            return False
         if not self.installed(pkg):
             return False
         if not (pkg.current_ver.priority == apt_pkg.PRI_OPTIONAL or\

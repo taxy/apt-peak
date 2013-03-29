@@ -13,10 +13,8 @@ def list_orphans(orphans, cache):
         peak = Peak(cache)
 
         for otherpkg in cache.packages:
-            if otherpkg.current_ver != None and not otherpkg.essential \
-                                            and not otherpkg.important:
-                if peak.is_peak(otherpkg):
-                    orphans.append(otherpkg.get_fullname(True))
+            if peak.is_peak(otherpkg):
+                orphans.append(otherpkg.get_fullname(True))
 
 if __name__ == '__main__':
     apt_pkg.init()
