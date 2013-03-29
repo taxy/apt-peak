@@ -95,9 +95,9 @@ class Peak:
         return False
 
     def dependency_version(self, pkg):
-        if pkg.id in self.deps:
+        if pkg.id in self.deps and self.deps[pkg.id]:
             return
-        self.deps.add(pkg.id)
+        self.deps[pkg.id] = True
 
         for or_group in pkg.current_ver.depends_list.get("PreDepends", []) + \
                 pkg.current_ver.depends_list.get("Depends", []):
@@ -131,7 +131,7 @@ class Peak:
         if len(self.provided_revdeps) == 0 and len(self.revrecommends) == 0:
             return True
 
-        self.deps = set()
+        self.deps = dict()
         self.dependencies(pkg)
 
         for prov_revd_pkg in self.provided_revdeps:
