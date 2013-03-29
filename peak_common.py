@@ -94,9 +94,6 @@ class Peak:
 
         return False
 
-    def is_available(self, pkg):
-        return pkg.has_provides or self.installed(pkg)
-
     def dependency_version(self, pkg):
         if self.installed(pkg):
             if pkg.id in self.deps:
@@ -106,9 +103,10 @@ class Peak:
             for or_group in pkg.current_ver.depends_list.get("PreDepends", []) + \
                     pkg.current_ver.depends_list.get("Depends", []):
                 for otherdep in or_group:
-                    if self.is_available(otherdep.target_pkg) and \
-                                    not self.has_revdepends_loop(otherdep.target_pkg):
-                        self.dependencies(otherdep.target_pkg)
+                    if self.installed(otherdep.target_pkg):
+                        if not self.has_revdepends_loop(otherdep.target_pkg):
+                            self.dependency_version(otherdep.target_pkg)
+                    self.dependency_provides(otherdep.target_pkg)
 
     def dependency_provides(self, pkg):
         if pkg.has_provides:
