@@ -13,6 +13,7 @@ class Peak:
         self.removed = None
         self.verbose = False
         self.verboseprint = lambda *a, **k: None
+        self.records = apt_pkg.PackageRecords(cache)
 
     def set_verbose(self, verbose):
         self.verbose = verbose
@@ -29,6 +30,13 @@ class Peak:
 
     def simulated_remove(self, pkg):
         self.removed.add(pkg.id)
+
+    def source(self, pkg):
+        self.records.Lookup(pkg.current_ver.file_list[0])
+        if(len(self.records.source_pkg) == 0):
+            return pkg.name
+        else:
+            return self.records.source_pkg
 
     def has_revdeps_without_provides(self, pkg):
         self.verboseprint("Reverse depends:", pkg.get_fullname(True))
@@ -121,7 +129,6 @@ class Peak:
             self.dependency_version(pkg)
         self.dependency_provides(pkg)
 
-
     def is_peak(self, pkg):
         if pkg.essential or pkg.important:
             self.verboseprint("Package is important:", pkg.get_fullname(True))
@@ -146,6 +153,7 @@ class Peak:
 
         self.deps = dict()
         self.dependencies(pkg)
+        pkg_source = self.source(pkg)
 
         for prov_revd_pkg in self.provided_revdeps:
             if not prov_revd_pkg.id in self.deps:
@@ -155,6 +163,9 @@ class Peak:
         for revr_pkg in self.revrecommends:
             if not revr_pkg.id in self.deps:
                 self.verboseprint("Found reverse recommend:", revr_pkg.get_fullname(True))
+                return False
+            if pkg_source == self.source(revr_pkg) and\
+                    self.has_revdepends_loop(revr_pkg):
                 return False
 
         return True
