@@ -165,6 +165,7 @@ class Peak:
                 return False
             if pkg_source == self.source(revr_pkg) and\
                     not self.deps[revr_pkg.id]:
+                self.verboseprint("Found source reverse recommend:", revr_pkg.get_fullname(True))
                 return False
 
         return True
