@@ -130,11 +130,10 @@ class Peak:
         self.dependency_provides(pkg)
 
     def is_peak(self, pkg):
+        if not self.installed(pkg):
+            return False
         if pkg.essential or pkg.important:
             self.verboseprint("Package is important:", pkg.get_fullname(True))
-            return False
-        if not self.installed(pkg):
-            self.verboseprint("Package is not installed:", pkg.get_fullname(True))
             return False
         if not (pkg.current_ver.priority == apt_pkg.PRI_OPTIONAL or\
                  pkg.current_ver.priority == apt_pkg.PRI_EXTRA):
@@ -165,7 +164,7 @@ class Peak:
                 self.verboseprint("Found reverse recommend:", revr_pkg.get_fullname(True))
                 return False
             if pkg_source == self.source(revr_pkg) and\
-                    self.has_revdepends_loop(revr_pkg):
+                    not self.deps[revr_pkg.id]:
                 return False
 
         return True
