@@ -25,7 +25,18 @@ if __name__ == '__main__':
 
     cache = apt_pkg.Cache(None)
 
-    test_pkg = cache[sys.argv[1]]
+    if len(sys.argv) != 2:
+        print("usage: "+ sys.argv[0] + " package_name", file=sys.stderr)
+        sys.exit()
+    try:
+        test_pkg = cache[sys.argv[1]]
+    except KeyError as e:
+        print("Package not found:", str(e).strip('"'), file=sys.stderr)
+        sys.exit()
+    if test_pkg.current_ver == None:
+        print("error: Package is not istalled.", file=sys.stderr)
+        sys.exit()
+
     peak = Peak(cache)
     peak.set_verbose(True)
     if peak.is_peak(test_pkg):
