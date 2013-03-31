@@ -41,7 +41,7 @@ def packages_parse(argv, cache, remove, keep):
 
 def add_providers(target_pkg, related_ids, related_pkgs):
     if target_pkg.has_provides:
-        for provider in pkg.provides_list:
+        for provider in target_pkg.provides_list:
             if not provider[2].parent_pkg.id in related_ids and\
                     provider[2].parent_pkg.current_ver != None and\
                     provider[2].parent_pkg.current_ver.id == provider[2].id:
