@@ -169,3 +169,66 @@ class Peak:
                 return False
 
         return True
+
+class Peak_tree:
+
+    def __init__(self, cache):
+        self.cache = cache
+
+    def add_providers(self, target_pkg, related_ids):
+        if target_pkg.has_provides:
+            for provider in target_pkg.provides_list:
+                if not provider[2].parent_pkg.id in related_ids and\
+                        provider[2].parent_pkg.current_ver != None and\
+                            provider[2].parent_pkg.current_ver.id == provider[2].id:
+                    related_ids.add(provider[2].parent_pkg.id)
+                    self.related_pkgs.append(provider[2].parent_pkg)
+
+
+    def collect_all_related_pkgs(self):
+        related_ids = set()
+        for pkg in self.remove:
+            if pkg.current_ver != None:
+                for or_group in pkg.current_ver.depends_list.get("PreDepends", []) + \
+                        pkg.current_ver.depends_list.get("Depends", []) + \
+                        pkg.current_ver.depends_list.get("Recommends", []):
+                    for otherdep in or_group:
+                        if not otherdep.target_pkg.id in related_ids:
+                            if otherdep.target_pkg.current_ver != None:
+                                related_ids.add(otherdep.target_pkg.id)
+                                self.related_pkgs.append(otherdep.target_pkg)
+                            else:
+                                self.add_providers(otherdep.target_pkg, related_ids)
+
+
+    def collect_is_peak(self):
+        for otherpkg in self.related_pkgs:
+            if not otherpkg.id in self.removable_ids and\
+                    self.peak.is_peak(otherpkg):
+                self.remove.append(otherpkg)
+
+    def get_peak_tree(self, remove, keep, removable):
+        self.peak = Peak(self.cache)
+        self.peak.simulation_mode_on()
+
+        self.remove = list()
+        self.remove.extend(remove)
+        self.removable_ids = set()
+        for k_pkg in keep:
+            self.removable_ids.add(k_pkg.id)
+        for pkg in self.remove:
+            self.peak.simulated_remove(pkg)
+            self.removable_ids.add(pkg.id)
+            removable.append(pkg)
+
+        self.related_pkgs = list()
+
+        while len(self.remove) > 0:
+            self.collect_all_related_pkgs()
+            del self.remove[:]
+            self.collect_is_peak()
+            del self.related_pkgs[:]
+            for pkg in self.remove:
+                self.peak.simulated_remove(pkg)
+                self.removable_ids.add(pkg.id)
+                removable.append(pkg)
