@@ -1,0 +1,25 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import gtk
+
+
+class GPeak (object):
+
+    def __init__(self):
+        self.builder = gtk.Builder()
+        self.builder.add_from_file("packet-peak.glade")
+        self.builder.connect_signals(self)
+
+    def run(self):
+        self.builder.get_object("xpacket_peak").show_all()
+        self.builder.get_object("confirmed").get_selection().set_mode(gtk.SELECTION_MULTIPLE)
+        self.builder.get_object("peak").get_selection().set_mode(gtk.SELECTION_MULTIPLE)
+        self.builder.get_object("removable").get_selection().set_mode(gtk.SELECTION_MULTIPLE)
+        gtk.main()
+
+    def on_window1_destroy(self, *args):
+        gtk.main_quit()
+
+
+GPeak().run()
