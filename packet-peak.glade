@@ -8,21 +8,9 @@
       <column type="gchararray"/>
       <!-- column-name color -->
       <column type="gchararray"/>
+      <!-- column-name pkgid -->
+      <column type="guint"/>
     </columns>
-    <data>
-      <row>
-        <col id="0" translatable="yes">glade-gtk2</col>
-        <col id="1">#097400</col>
-      </row>
-      <row>
-        <col id="0" translatable="yes">mc</col>
-        <col id="1" translatable="yes">#097400</col>
-      </row>
-      <row>
-        <col id="0" translatable="yes">packet-peak</col>
-        <col id="1" translatable="yes">#097400</col>
-      </row>
-    </data>
   </object>
   <object class="GtkListStore" id="peak_liststore">
     <columns>
@@ -30,29 +18,9 @@
       <column type="gchararray"/>
       <!-- column-name color -->
       <column type="gchararray"/>
+      <!-- column-name pkgid -->
+      <column type="guint"/>
     </columns>
-    <data>
-      <row>
-        <col id="0" translatable="yes">apt-file</col>
-        <col id="1" translatable="yes">#000000</col>
-      </row>
-      <row>
-        <col id="0" translatable="yes">build-essential</col>
-        <col id="1" translatable="yes">#000000</col>
-      </row>
-      <row>
-        <col id="0" translatable="yes">software-properties-common</col>
-        <col id="1" translatable="yes">#000000</col>
-      </row>
-      <row>
-        <col id="0" translatable="yes">ubuntu-dev-tools</col>
-        <col id="1" translatable="yes">#000000</col>
-      </row>
-      <row>
-        <col id="0" translatable="yes">cdbs</col>
-        <col id="1" translatable="yes">#000000</col>
-      </row>
-    </data>
   </object>
   <object class="GtkListStore" id="removable_liststore">
     <columns>
@@ -60,13 +28,9 @@
       <column type="gchararray"/>
       <!-- column-name color -->
       <column type="gchararray"/>
+      <!-- column-name pkgid -->
+      <column type="guint"/>
     </columns>
-    <data>
-      <row>
-        <col id="0" translatable="yes">libalgorithm-diff-xs-perl</col>
-        <col id="1" translatable="yes">#760000</col>
-      </row>
-    </data>
   </object>
   <object class="GtkImage" id="trash">
     <property name="visible">True</property>
@@ -403,6 +367,7 @@
             <property name="receives_default">True</property>
             <property name="use_action_appearance">False</property>
             <property name="use_stock">True</property>
+            <signal name="clicked" handler="refresh" swapped="no"/>
           </object>
           <packing>
             <property name="x">393</property>

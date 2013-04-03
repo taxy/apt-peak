@@ -1,8 +1,20 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import gtk
+from __future__ import print_function
 
+import gtk
+import apt_pkg
+import sys
+from peak_common import Peak
+
+class Package:
+    def __init__(self, pkg_dict, pkg):
+        self.pkg = pkg
+        self.is_peak = False
+        self.is_confirmed = False
+        self.is_removable = False
+        pkg_dict[pkg.id] = self
 
 class GPeak (object):
 
@@ -11,15 +23,46 @@ class GPeak (object):
         self.builder.add_from_file("packet-peak.glade")
         self.builder.connect_signals(self)
 
+    def list_orphans(self):
+
+        peak = Peak(self.cache)
+
+        for otherpkg in self.cache.packages:
+            if peak.is_peak(otherpkg):
+                package = Package(self.packages, otherpkg)
+                package.is_peak = True
+
+    def update_peak_list(self):
+        self.peak_liststore.clear()
+        for pkgid, package in self.packages.items():
+            if package.is_peak:
+                self.peak_liststore.append([package.pkg.get_fullname(True), "#000000", pkgid])
+
+    def refresh(self, *args):
+        self.packages = dict()
+        self.cache = apt_pkg.Cache()
+        print("Search peak packages...", end="")
+        sys.stdout.flush()
+        self.list_orphans()
+        print(" Done")
+        sys.stdout.flush()
+
+        self.update_peak_list()
+
     def run(self):
         self.builder.get_object("xpacket_peak").show_all()
         self.builder.get_object("confirmed").get_selection().set_mode(gtk.SELECTION_MULTIPLE)
         self.builder.get_object("peak").get_selection().set_mode(gtk.SELECTION_MULTIPLE)
         self.builder.get_object("removable").get_selection().set_mode(gtk.SELECTION_MULTIPLE)
+        self.peak_liststore = self.builder.get_object("peak_liststore")
+        self.peak_liststore.set_sort_column_id(0, gtk.SORT_ASCENDING)
+
+        self.refresh()
         gtk.main()
 
     def on_window1_destroy(self, *args):
         gtk.main_quit()
 
 
+apt_pkg.init()
 GPeak().run()
