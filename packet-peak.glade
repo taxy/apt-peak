@@ -257,6 +257,8 @@
                     <child>
                       <object class="GtkTreeViewColumn" id="packcol">
                         <property name="title" translatable="yes">Package</property>
+                        <property name="reorderable">True</property>
+                        <property name="sort_column_id">0</property>
                         <child>
                           <object class="GtkCellRendererText" id="cellrenderertext1"/>
                           <attributes>
@@ -298,6 +300,8 @@
                     <child>
                       <object class="GtkTreeViewColumn" id="packcol1">
                         <property name="title" translatable="yes">Package</property>
+                        <property name="reorderable">True</property>
+                        <property name="sort_column_id">0</property>
                         <child>
                           <object class="GtkCellRendererText" id="cellrenderertext2"/>
                           <attributes>
@@ -338,6 +342,8 @@
                     <child>
                       <object class="GtkTreeViewColumn" id="packcol2">
                         <property name="title" translatable="yes">Package</property>
+                        <property name="reorderable">True</property>
+                        <property name="sort_column_id">0</property>
                         <child>
                           <object class="GtkCellRendererText" id="cellrenderertext3"/>
                           <attributes>
