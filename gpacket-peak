@@ -32,11 +32,28 @@ class GPeak (object):
                 package = Package(self.packages, otherpkg)
                 package.is_peak = True
 
+    def update_confirmed_list(self):
+        self.confirmed_liststore.clear()
+        for pkgid, package in self.packages.items():
+            if package.is_confirmed:
+                self.confirmed_liststore.append([package.pkg.get_fullname(True), "#000000", pkgid])
+
     def update_peak_list(self):
         self.peak_liststore.clear()
         for pkgid, package in self.packages.items():
             if package.is_peak:
                 self.peak_liststore.append([package.pkg.get_fullname(True), "#000000", pkgid])
+
+    def update_removable_list(self):
+        self.removable_liststore.clear()
+        for pkgid, package in self.packages.items():
+            if package.is_removable:
+                self.removable_liststore.append([package.pkg.get_fullname(True), "#000000", pkgid])
+
+    def update_lists(self):
+        self.update_confirmed_list()
+        self.update_peak_list()
+        self.update_removable_list()
 
     def init_gui_objects(self):
         self.confirmed = self.builder.get_object("confirmed")
@@ -57,7 +74,6 @@ class GPeak (object):
         self.removable_liststore = self.builder.get_object("removable_liststore")
         self.removable_liststore.set_sort_column_id(0, gtk.SORT_ASCENDING)
 
-
     def refresh(self, *args):
         self.packages = dict()
         self.cache = apt_pkg.Cache()
@@ -67,7 +83,7 @@ class GPeak (object):
         print(" Done")
         sys.stdout.flush()
 
-        self.update_peak_list()
+        self.update_lists()
 
     def run(self):
         self.builder.get_object("xpacket_peak").show_all()
