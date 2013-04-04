@@ -56,7 +56,7 @@ class GPeak (object):
     def update_peak_list(self):
         self.peak_liststore.clear()
         for pkgid, package in self.packages.items():
-            if package.is_peak and not package.is_confirmed and not package.is_removable:
+            if package.is_peak and not package.is_confirmed:
                 self.peak_liststore.append([package.pkg.get_fullname(True), self.pcolor(package), pkgid])
 
     def update_removable_list(self):
