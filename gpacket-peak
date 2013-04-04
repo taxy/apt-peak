@@ -190,6 +190,16 @@ class GPeak (object):
         self.refresh()
         gtk.main()
 
+    def click_perform_remove(self, *args):
+        remove = list()
+        for pkgid, package in self.packages.items():
+            if package.is_removable:
+                remove.append(package.pkg.get_fullname(True))
+        stream = os.popen("x-terminal-emulator -e sudo apt-get purge " + " ".join(remove))
+        stream.read()
+        stream.close()
+
+
     def load_confirm_set(self):
         load_file = os.path.expanduser("~/.config/packet-peak/confirmed.list")
         self.confirmed_set = set()

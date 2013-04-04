@@ -192,6 +192,7 @@
             <property name="receives_default">True</property>
             <property name="use_action_appearance">False</property>
             <property name="image">trash</property>
+            <signal name="clicked" handler="click_perform_remove" swapped="no"/>
           </object>
           <packing>
             <property name="x">627</property>
