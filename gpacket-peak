@@ -138,10 +138,19 @@ class GPeak (object):
     def run(self):
         self.builder.get_object("xpacket_peak").show_all()
         self.init_gui_objects()
-        self.confirmed_set = set()
+        self.load_confirm_set()
 
         self.refresh()
         gtk.main()
+
+    def load_confirm_set(self):
+        load_file = os.path.expanduser("~/.config/packet-peak/confirmed.list")
+        self.confirmed_set = set()
+        if not os.path.exists(load_file):
+            return
+        with open(load_file, 'r') as f:
+            lines = f.readlines()
+        [self.confirmed_set.add(e.strip()) for e in lines]
 
     def save_confirm_set(self):
         save_dir = os.path.expanduser("~/.config/packet-peak")
