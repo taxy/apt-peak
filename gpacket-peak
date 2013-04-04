@@ -32,23 +32,33 @@ class GPeak (object):
                 package = Package(self.packages, otherpkg)
                 package.is_peak = True
 
+    def pcolor(self, package):
+        if not package.is_peak:
+            return "#000088"
+        if package.is_confirmed:
+            return "#008800"
+        if package.is_removable:
+            return "#880000"
+        return "#000000"
+
+
     def update_confirmed_list(self):
         self.confirmed_liststore.clear()
         for pkgid, package in self.packages.items():
             if package.is_confirmed:
-                self.confirmed_liststore.append([package.pkg.get_fullname(True), "#000000", pkgid])
+                self.confirmed_liststore.append([package.pkg.get_fullname(True), self.pcolor(package), pkgid])
 
     def update_peak_list(self):
         self.peak_liststore.clear()
         for pkgid, package in self.packages.items():
             if package.is_peak and not package.is_confirmed and not package.is_removable:
-                self.peak_liststore.append([package.pkg.get_fullname(True), "#000000", pkgid])
+                self.peak_liststore.append([package.pkg.get_fullname(True), self.pcolor(package), pkgid])
 
     def update_removable_list(self):
         self.removable_liststore.clear()
         for pkgid, package in self.packages.items():
             if package.is_removable:
-                self.removable_liststore.append([package.pkg.get_fullname(True), "#000000", pkgid])
+                self.removable_liststore.append([package.pkg.get_fullname(True), self.pcolor(package), pkgid])
 
     def update_lists(self):
         self.update_confirmed_list()
