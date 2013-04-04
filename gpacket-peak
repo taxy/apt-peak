@@ -84,6 +84,13 @@ class GPeak (object):
         self.removable_liststore = self.builder.get_object("removable_liststore")
         self.removable_liststore.set_sort_column_id(0, gtk.SORT_ASCENDING)
 
+    def confirm_package(self, package, conf_value):
+        package.is_confirmed = conf_value
+        if conf_value:
+            self.confirmed_set.add(package.pkg.get_fullname(True))
+        else:
+            self.confirmed_set.remove(package.pkg.get_fullname(True))
+
     def confirm(self, *args):
         conf_value = False
         treeview = None
@@ -96,8 +103,23 @@ class GPeak (object):
 
         treemodel, paths = treeview.get_selection().get_selected_rows()
         for path in paths:
-            self.packages[treemodel[path][2]].is_confirmed = conf_value
+            package = self.packages[treemodel[path][2]]
+            self.confirm_package(package, conf_value)
         self.update_lists()
+
+    def add_confirm_set(self):
+        for package_name in self.confirmed_set:
+            try:
+                pkg = self.cache[package_name]
+                if pkg.id in self.packages:
+                    package = self.packages[pkg.id]
+                else:
+                    package = Package(self.packages, pkg)
+                package.is_confirmed = True
+
+            except KeyError as e:
+                print("Package not found:", str(e).strip('"'), file=sys.stderr)
+
 
     def refresh(self, *args):
         self.packages = dict()
@@ -108,11 +130,14 @@ class GPeak (object):
         print(" Done")
         sys.stdout.flush()
 
+        self.add_confirm_set()
+
         self.update_lists()
 
     def run(self):
         self.builder.get_object("xpacket_peak").show_all()
         self.init_gui_objects()
+        self.confirmed_set = set()
 
         self.refresh()
         gtk.main()
