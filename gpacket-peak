@@ -108,6 +108,13 @@ class GPeak (object):
             self.confirm_package(package, conf_value)
         self.update_lists()
 
+    def remove(self, *args):
+        treemodel, paths = self.peak.get_selection().get_selected_rows()
+        for path in paths:
+            package = self.packages[treemodel[path][2]]
+            package.is_removable = True
+        self.update_lists()
+
     def add_confirm_set(self):
         for package_name in self.confirmed_set:
             try:

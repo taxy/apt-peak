@@ -126,6 +126,7 @@
             <property name="receives_default">True</property>
             <property name="use_action_appearance">False</property>
             <property name="yalign">0.54000002145767212</property>
+            <signal name="clicked" handler="remove" swapped="no"/>
           </object>
           <packing>
             <property name="x">388</property>
