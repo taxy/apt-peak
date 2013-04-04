@@ -159,6 +159,7 @@
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
             <property name="use_action_appearance">False</property>
+            <signal name="clicked" handler="add_peak_tree" swapped="no"/>
           </object>
           <packing>
             <property name="x">624</property>
@@ -174,6 +175,7 @@
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
             <property name="use_action_appearance">False</property>
+            <signal name="clicked" handler="confirm" swapped="no"/>
           </object>
           <packing>
             <property name="x">624</property>

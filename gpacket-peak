@@ -8,6 +8,7 @@ import apt_pkg
 import sys
 import os
 from peak_common import Peak
+from peak_common import Peak_tree
 
 class Package:
     def __init__(self, pkg_dict, pkg):
@@ -89,8 +90,11 @@ class GPeak (object):
         package.is_confirmed = conf_value
         if conf_value:
             self.confirmed_set.add(package.pkg.get_fullname(True))
+            package.is_removable = False
         else:
             self.confirmed_set.remove(package.pkg.get_fullname(True))
+            if not package.is_peak:
+                package.is_removable = True
 
     def confirm(self, *args):
         conf_value = False
@@ -101,6 +105,9 @@ class GPeak (object):
         if args[0].get_label() == "Unconfirm >>":
             treeview = self.confirmed
             conf_value = False
+        if args[0].get_label() == "Move to confirmed >>":
+            treeview = self.removable
+            conf_value = True
 
         treemodel, paths = treeview.get_selection().get_selected_rows()
         for path in paths:
@@ -128,6 +135,34 @@ class GPeak (object):
             except KeyError as e:
                 print("Package not found:", str(e).strip('"'), file=sys.stderr)
 
+    def add_peak_tree(self, *args):
+        remove = list()
+        keep = list()
+        not_peak = list()
+        peak_tree = Peak_tree(self.cache)
+
+        for pkgid, package in self.packages.items():
+            if package.is_removable:
+                if package.is_peak:
+                    remove.append(package.pkg)
+                else:
+                    not_peak.append(pkgid)
+            if package.is_confirmed:
+                    keep.append(package.pkg)
+
+        for pkgid in not_peak:
+            self.packages.pop(pkgid)
+
+        removable = list()
+        peak_tree.get_peak_tree(remove, keep, removable)
+
+        for pkg in removable:
+            if pkg.id in self.packages:
+                package = self.packages[pkg.id]
+            else:
+                package = Package(self.packages, pkg)
+            package.is_removable = True
+        self.update_lists()
 
     def refresh(self, *args):
         self.packages = dict()
