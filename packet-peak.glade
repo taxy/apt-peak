@@ -367,6 +367,23 @@
             <property name="y">102</property>
           </packing>
         </child>
+        <child>
+          <object class="GtkButton" id="clear_remavables">
+            <property name="label">gtk-clear</property>
+            <property name="width_request">100</property>
+            <property name="height_request">31</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <property name="use_action_appearance">False</property>
+            <property name="use_stock">True</property>
+            <signal name="clicked" handler="clear_removables" swapped="no"/>
+          </object>
+          <packing>
+            <property name="x">626</property>
+            <property name="y">155</property>
+          </packing>
+        </child>
       </object>
     </child>
   </object>

@@ -69,6 +69,7 @@ class GPeak (object):
         self.update_confirmed_list()
         self.update_peak_list()
         self.update_removable_list()
+        self.perform_remove.set_sensitive(False)
 
     def init_gui_objects(self):
         self.confirmed = self.builder.get_object("confirmed")
@@ -119,7 +120,6 @@ class GPeak (object):
             package = self.packages[treemodel[path][2]]
             self.confirm_package(package, conf_value)
         self.update_lists()
-        self.perform_remove.set_sensitive(False)
 
     def remove(self, *args):
         treemodel, paths = self.peak.get_selection().get_selected_rows()
@@ -127,6 +127,21 @@ class GPeak (object):
             package = self.packages[treemodel[path][2]]
             package.is_removable = True
         self.update_lists()
+
+    def clear_removables(self, *args):
+        not_peak = list()
+
+        for pkgid, package in self.packages.items():
+            if package.is_removable:
+                if package.is_peak:
+                    package.is_removable = False
+                else:
+                    not_peak.append(pkgid)
+
+        for pkgid in not_peak:
+            self.packages.pop(pkgid)
+        self.update_lists()
+
 
     def add_confirm_set(self):
         for package_name in self.confirmed_set:
@@ -183,7 +198,6 @@ class GPeak (object):
         self.add_confirm_set()
 
         self.update_lists()
-        self.perform_remove.set_sensitive(False)
 
     def run(self):
         self.builder.get_object("xpacket_peak").show_all()
