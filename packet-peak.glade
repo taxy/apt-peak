@@ -219,16 +219,11 @@
             <property name="can_focus">True</property>
             <property name="hscrollbar_policy">automatic</property>
             <property name="vscrollbar_policy">automatic</property>
+            <property name="shadow_type">in</property>
             <child>
-              <object class="GtkViewport" id="viewport1">
+              <object class="GtkTextView" id="description">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
-                <child>
-                  <object class="GtkTextView" id="description">
-                    <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                  </object>
-                </child>
               </object>
             </child>
           </object>
@@ -245,30 +240,25 @@
             <property name="can_focus">True</property>
             <property name="hscrollbar_policy">automatic</property>
             <property name="vscrollbar_policy">automatic</property>
+            <property name="shadow_type">in</property>
             <child>
-              <object class="GtkViewport" id="viewport2">
+              <object class="GtkTreeView" id="confirmed">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
+                <property name="can_focus">True</property>
+                <property name="model">confirmed_liststore</property>
+                <property name="search_column">0</property>
                 <child>
-                  <object class="GtkTreeView" id="confirmed">
-                    <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="model">confirmed_liststore</property>
-                    <property name="headers_clickable">False</property>
-                    <property name="search_column">0</property>
+                  <object class="GtkTreeViewColumn" id="packcol">
+                    <property name="title" translatable="yes">Package</property>
+                    <property name="clickable">True</property>
+                    <property name="reorderable">True</property>
+                    <property name="sort_column_id">0</property>
                     <child>
-                      <object class="GtkTreeViewColumn" id="packcol">
-                        <property name="title" translatable="yes">Package</property>
-                        <property name="reorderable">True</property>
-                        <property name="sort_column_id">0</property>
-                        <child>
-                          <object class="GtkCellRendererText" id="cellrenderertext1"/>
-                          <attributes>
-                            <attribute name="foreground">1</attribute>
-                            <attribute name="text">0</attribute>
-                          </attributes>
-                        </child>
-                      </object>
+                      <object class="GtkCellRendererText" id="cellrenderertext1"/>
+                      <attributes>
+                        <attribute name="foreground">1</attribute>
+                        <attribute name="text">0</attribute>
+                      </attributes>
                     </child>
                   </object>
                 </child>
@@ -288,30 +278,25 @@
             <property name="can_focus">True</property>
             <property name="hscrollbar_policy">automatic</property>
             <property name="vscrollbar_policy">automatic</property>
+            <property name="shadow_type">in</property>
             <child>
-              <object class="GtkViewport" id="viewport3">
+              <object class="GtkTreeView" id="peak">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
+                <property name="can_focus">True</property>
+                <property name="model">peak_liststore</property>
+                <property name="search_column">0</property>
                 <child>
-                  <object class="GtkTreeView" id="peak">
-                    <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="model">peak_liststore</property>
-                    <property name="headers_clickable">False</property>
-                    <property name="search_column">0</property>
+                  <object class="GtkTreeViewColumn" id="packcol1">
+                    <property name="title" translatable="yes">Package</property>
+                    <property name="clickable">True</property>
+                    <property name="reorderable">True</property>
+                    <property name="sort_column_id">0</property>
                     <child>
-                      <object class="GtkTreeViewColumn" id="packcol1">
-                        <property name="title" translatable="yes">Package</property>
-                        <property name="reorderable">True</property>
-                        <property name="sort_column_id">0</property>
-                        <child>
-                          <object class="GtkCellRendererText" id="cellrenderertext2"/>
-                          <attributes>
-                            <attribute name="foreground">1</attribute>
-                            <attribute name="text">0</attribute>
-                          </attributes>
-                        </child>
-                      </object>
+                      <object class="GtkCellRendererText" id="cellrenderertext2"/>
+                      <attributes>
+                        <attribute name="foreground">1</attribute>
+                        <attribute name="text">0</attribute>
+                      </attributes>
                     </child>
                   </object>
                 </child>
@@ -331,29 +316,25 @@
             <property name="can_focus">True</property>
             <property name="hscrollbar_policy">automatic</property>
             <property name="vscrollbar_policy">automatic</property>
+            <property name="shadow_type">in</property>
             <child>
-              <object class="GtkViewport" id="viewport4">
+              <object class="GtkTreeView" id="removable">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
+                <property name="can_focus">True</property>
+                <property name="model">removable_liststore</property>
+                <property name="search_column">0</property>
                 <child>
-                  <object class="GtkTreeView" id="removable">
-                    <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="model">removable_liststore</property>
-                    <property name="headers_clickable">False</property>
+                  <object class="GtkTreeViewColumn" id="packcol2">
+                    <property name="title" translatable="yes">Package</property>
+                    <property name="clickable">True</property>
+                    <property name="reorderable">True</property>
+                    <property name="sort_column_id">0</property>
                     <child>
-                      <object class="GtkTreeViewColumn" id="packcol2">
-                        <property name="title" translatable="yes">Package</property>
-                        <property name="reorderable">True</property>
-                        <property name="sort_column_id">0</property>
-                        <child>
-                          <object class="GtkCellRendererText" id="cellrenderertext3"/>
-                          <attributes>
-                            <attribute name="foreground">1</attribute>
-                            <attribute name="text">0</attribute>
-                          </attributes>
-                        </child>
-                      </object>
+                      <object class="GtkCellRendererText" id="cellrenderertext3"/>
+                      <attributes>
+                        <attribute name="foreground">1</attribute>
+                        <attribute name="text">0</attribute>
+                      </attributes>
                     </child>
                   </object>
                 </child>
