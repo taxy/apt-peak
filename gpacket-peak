@@ -86,6 +86,8 @@ class GPeak (object):
         self.removable_liststore = self.builder.get_object("removable_liststore")
         self.removable_liststore.set_sort_column_id(0, gtk.SORT_ASCENDING)
 
+        self.perform_remove = self.builder.get_object("perform_remove")
+
     def confirm_package(self, package, conf_value):
         package.is_confirmed = conf_value
         if conf_value:
@@ -114,6 +116,7 @@ class GPeak (object):
             package = self.packages[treemodel[path][2]]
             self.confirm_package(package, conf_value)
         self.update_lists()
+        self.perform_remove.set_sensitive(False)
 
     def remove(self, *args):
         treemodel, paths = self.peak.get_selection().get_selected_rows()
@@ -163,6 +166,7 @@ class GPeak (object):
                 package = Package(self.packages, pkg)
             package.is_removable = True
         self.update_lists()
+        self.perform_remove.set_sensitive(True)
 
     def refresh(self, *args):
         self.packages = dict()
@@ -176,6 +180,7 @@ class GPeak (object):
         self.add_confirm_set()
 
         self.update_lists()
+        self.perform_remove.set_sensitive(False)
 
     def run(self):
         self.builder.get_object("xpacket_peak").show_all()

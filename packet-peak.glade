@@ -183,7 +183,7 @@
           </packing>
         </child>
         <child>
-          <object class="GtkButton" id="remove">
+          <object class="GtkButton" id="perform_remove">
             <property name="label" translatable="yes">Perform remove</property>
             <property name="width_request">160</property>
             <property name="height_request">29</property>
