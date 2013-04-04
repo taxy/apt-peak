@@ -10,5 +10,7 @@ setup(name="packet-peak",
       author="Kollár Endre",
       author_email="taxy443@gmail.com",
       py_modules=['peak_common'],
-      scripts=['package_peak','package_debug','peak_tree']
+      scripts=['package_peak','package_debug','peak_tree','gpacket-peak'],
+      data_files = [('share/packet-peak/glade',
+                     ['packet-peak.glade'])]
       )

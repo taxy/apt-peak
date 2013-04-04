@@ -22,7 +22,10 @@ class GPeak (object):
 
     def __init__(self):
         self.builder = gtk.Builder()
-        self.builder.add_from_file("packet-peak.glade")
+        glade_file = "packet-peak.glade"
+        if not os.path.exists(glade_file):
+            glade_file = "/usr/share/packet-peak/glade/packet-peak.glade"
+        self.builder.add_from_file(glade_file)
         self.builder.connect_signals(self)
 
     def list_orphans(self):
