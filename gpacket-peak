@@ -144,6 +144,7 @@ class GPeak (object):
 
 
     def add_confirm_set(self):
+        not_package = list()
         for package_name in self.confirmed_set:
             try:
                 pkg = self.cache[package_name]
@@ -155,6 +156,9 @@ class GPeak (object):
 
             except KeyError as e:
                 print("Package not found:", str(e).strip('"'), file=sys.stderr)
+                not_package.append(package_name)
+        for package_name in not_package:
+            self.confirmed_set.remove(package_name)
 
     def add_peak_tree(self, *args):
         remove = list()
