@@ -52,7 +52,7 @@
         <property name="can_focus">False</property>
         <child>
           <object class="GtkLabel" id="label1">
-            <property name="width_request">90</property>
+            <property name="width_request">170</property>
             <property name="height_request">30</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
@@ -64,13 +64,13 @@
             </attributes>
           </object>
           <packing>
-            <property name="x">33</property>
-            <property name="y">10</property>
+            <property name="x">6</property>
+            <property name="y">11</property>
           </packing>
         </child>
         <child>
           <object class="GtkLabel" id="label2">
-            <property name="width_request">89</property>
+            <property name="width_request">240</property>
             <property name="height_request">29</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
@@ -80,7 +80,7 @@
             </attributes>
           </object>
           <packing>
-            <property name="x">277</property>
+            <property name="x">300</property>
             <property name="y">10</property>
           </packing>
         </child>
@@ -96,8 +96,8 @@
             <signal name="clicked" handler="confirm" swapped="no"/>
           </object>
           <packing>
-            <property name="x">148</property>
-            <property name="y">149</property>
+            <property name="x">183</property>
+            <property name="y">157</property>
           </packing>
         </child>
         <child>
@@ -112,8 +112,8 @@
             <signal name="clicked" handler="confirm" swapped="no"/>
           </object>
           <packing>
-            <property name="x">144</property>
-            <property name="y">289</property>
+            <property name="x">184</property>
+            <property name="y">288</property>
           </packing>
         </child>
         <child>
@@ -129,13 +129,13 @@
             <signal name="clicked" handler="remove" swapped="no"/>
           </object>
           <packing>
-            <property name="x">388</property>
-            <property name="y">218</property>
+            <property name="x">544</property>
+            <property name="y">228</property>
           </packing>
         </child>
         <child>
           <object class="GtkLabel" id="label3">
-            <property name="width_request">124</property>
+            <property name="width_request">173</property>
             <property name="height_request">32</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
@@ -146,7 +146,7 @@
             </attributes>
           </object>
           <packing>
-            <property name="x">491</property>
+            <property name="x">650</property>
             <property name="y">10</property>
           </packing>
         </child>
@@ -162,8 +162,8 @@
             <signal name="clicked" handler="add_peak_tree" swapped="no"/>
           </object>
           <packing>
-            <property name="x">624</property>
-            <property name="y">115</property>
+            <property name="x">833</property>
+            <property name="y">122</property>
           </packing>
         </child>
         <child>
@@ -178,8 +178,8 @@
             <signal name="clicked" handler="confirm" swapped="no"/>
           </object>
           <packing>
-            <property name="x">624</property>
-            <property name="y">257</property>
+            <property name="x">830</property>
+            <property name="y">267</property>
           </packing>
         </child>
         <child>
@@ -195,50 +195,13 @@
             <signal name="clicked" handler="click_perform_remove" swapped="no"/>
           </object>
           <packing>
-            <property name="x">627</property>
-            <property name="y">423</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkLabel" id="label4">
-            <property name="width_request">229</property>
-            <property name="height_request">33</property>
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="label" translatable="yes">Package description</property>
-            <attributes>
-              <attribute name="underline" value="True"/>
-            </attributes>
-          </object>
-          <packing>
-            <property name="x">755</property>
-            <property name="y">9</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkScrolledWindow" id="scrolledwindow1">
-            <property name="width_request">232</property>
-            <property name="height_request">200</property>
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="hscrollbar_policy">automatic</property>
-            <property name="vscrollbar_policy">automatic</property>
-            <property name="shadow_type">in</property>
-            <child>
-              <object class="GtkTextView" id="description">
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-              </object>
-            </child>
-          </object>
-          <packing>
-            <property name="x">753</property>
-            <property name="y">41</property>
+            <property name="x">831</property>
+            <property name="y">417</property>
           </packing>
         </child>
         <child>
           <object class="GtkScrolledWindow" id="scrolledwindow_confirm">
-            <property name="width_request">126</property>
+            <property name="width_request">175</property>
             <property name="height_request">498</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
@@ -270,13 +233,13 @@
             </child>
           </object>
           <packing>
-            <property name="x">14</property>
+            <property name="x">5</property>
             <property name="y">44</property>
           </packing>
         </child>
         <child>
           <object class="GtkScrolledWindow" id="scrolledwindow_peak">
-            <property name="width_request">126</property>
+            <property name="width_request">240</property>
             <property name="height_request">498</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
@@ -308,13 +271,13 @@
             </child>
           </object>
           <packing>
-            <property name="x">259</property>
+            <property name="x">300</property>
             <property name="y">44</property>
           </packing>
         </child>
         <child>
           <object class="GtkScrolledWindow" id="scrolledwindow_removable">
-            <property name="width_request">126</property>
+            <property name="width_request">175</property>
             <property name="height_request">498</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
@@ -346,7 +309,7 @@
             </child>
           </object>
           <packing>
-            <property name="x">490</property>
+            <property name="x">650</property>
             <property name="y">44</property>
           </packing>
         </child>
@@ -363,8 +326,8 @@
             <signal name="clicked" handler="refresh" swapped="no"/>
           </object>
           <packing>
-            <property name="x">393</property>
-            <property name="y">102</property>
+            <property name="x">543</property>
+            <property name="y">118</property>
           </packing>
         </child>
         <child>
@@ -380,8 +343,8 @@
             <signal name="clicked" handler="clear_removables" swapped="no"/>
           </object>
           <packing>
-            <property name="x">626</property>
-            <property name="y">155</property>
+            <property name="x">832</property>
+            <property name="y">168</property>
           </packing>
         </child>
       </object>
