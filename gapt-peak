@@ -228,7 +228,9 @@ class GPeak (object):
         load_file = os.path.expanduser("~/.config/apt-peak/confirmed.list")
         self.confirmed_set = set()
         if not os.path.exists(load_file):
-            return
+            load_file = os.path.expanduser("~/.config/packet-peak/confirmed.list")
+            if not os.path.exists(load_file):
+                return
         with open(load_file, 'r') as f:
             lines = f.readlines()
         [self.confirmed_set.add(e.strip()) for e in lines]
