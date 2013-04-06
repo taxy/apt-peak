@@ -22,9 +22,9 @@ class GPeak (object):
 
     def __init__(self):
         self.builder = gtk.Builder()
-        glade_file = "packet-peak.glade"
+        glade_file = "apt-peak.glade"
         if not os.path.exists(glade_file):
-            glade_file = "/usr/share/packet-peak/glade/packet-peak.glade"
+            glade_file = "/usr/share/apt-peak/glade/apt-peak.glade"
         self.builder.add_from_file(glade_file)
         self.builder.connect_signals(self)
 
@@ -207,7 +207,7 @@ class GPeak (object):
         self.update_lists()
 
     def run(self):
-        self.builder.get_object("xpacket_peak").show_all()
+        self.builder.get_object("gapt_peak").show_all()
         self.init_gui_objects()
         self.load_confirm_set()
 
@@ -225,7 +225,7 @@ class GPeak (object):
 
 
     def load_confirm_set(self):
-        load_file = os.path.expanduser("~/.config/packet-peak/confirmed.list")
+        load_file = os.path.expanduser("~/.config/apt-peak/confirmed.list")
         self.confirmed_set = set()
         if not os.path.exists(load_file):
             return
@@ -234,7 +234,7 @@ class GPeak (object):
         [self.confirmed_set.add(e.strip()) for e in lines]
 
     def save_confirm_set(self):
-        save_dir = os.path.expanduser("~/.config/packet-peak")
+        save_dir = os.path.expanduser("~/.config/apt-peak")
         if not os.path.exists(save_dir):
             os.makedirs(save_dir)
         outfile = open(save_dir + "/confirmed.list", 'w')
