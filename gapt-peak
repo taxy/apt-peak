@@ -16,8 +16,70 @@ class Package:
         self.is_peak = False
         self.is_confirmed = False
         self.is_removable = False
+        self.treerow_peak = None
+        self.treerow_confirmed = None
+        self.treerow_removable = None
         self.gpeak = gpeak
         gpeak.packages[pkg.id] = self
+
+    def pcolor(self):
+        if not self.is_peak:
+            return "#000088"
+        if self.is_confirmed:
+            return "#008800"
+        if self.is_removable:
+            return "#880000"
+        return "#000000"
+
+    def add_row(self, liststore):
+        iter_row = liststore.append([self.pkg.get_fullname(True), self.pcolor(), self.pkg.id])
+        path_row = liststore.get_path(iter_row)
+        return gtk.TreeRowReference(liststore, path_row)
+
+    def remove_row(self, treerow):
+        treemodel = treerow.get_model()
+        iter_row = treemodel.get_iter(treerow.get_path())
+        treemodel.remove(iter_row)
+
+    def recolor(self, treerow):
+        treemodel = treerow.get_model()
+        iter_row = treemodel.get_iter(treerow.get_path())
+        treemodel.set_value(iter_row, 1, self.pcolor())
+
+    def update_rows(self):
+        in_confirmed = self.is_confirmed
+        in_removable = self.is_removable
+        in_peak = self.is_peak and not self.is_confirmed
+
+        if in_confirmed:
+            if self.treerow_confirmed == None:
+                self.treerow_confirmed = self.add_row(self.gpeak.confirmed_liststore)
+            else:
+                self.recolor(self.treerow_confirmed)
+        else:
+            if self.treerow_confirmed != None:
+                self.remove_row(self.treerow_confirmed)
+                self.treerow_confirmed = None
+
+        if in_removable:
+            if self.treerow_removable == None:
+                self.treerow_removable = self.add_row(self.gpeak.removable_liststore)
+            else:
+                self.recolor(self.treerow_removable)
+        else:
+            if self.treerow_removable != None:
+                self.remove_row(self.treerow_removable)
+                self.treerow_removable = None
+
+        if in_peak:
+            if self.treerow_peak == None:
+                self.treerow_peak = self.add_row(self.gpeak.peak_liststore)
+            else:
+                self.recolor(self.treerow_peak)
+        else:
+            if self.treerow_peak != None:
+                self.remove_row(self.treerow_peak)
+                self.treerow_peak = None
 
 class GPeak (object):
 
@@ -38,26 +100,9 @@ class GPeak (object):
                 package = Package(self, otherpkg)
                 package.is_peak = True
 
-    def pcolor(self, package):
-        if not package.is_peak:
-            return "#000088"
-        if package.is_confirmed:
-            return "#008800"
-        if package.is_removable:
-            return "#880000"
-        return "#000000"
-
     def update_lists(self):
-        self.confirmed_liststore.clear()
-        self.peak_liststore.clear()
-        self.removable_liststore.clear()
         for pkgid, package in self.packages.items():
-            if package.is_confirmed:
-                self.confirmed_liststore.append([package.pkg.get_fullname(True), self.pcolor(package), pkgid])
-            if package.is_removable:
-                self.removable_liststore.append([package.pkg.get_fullname(True), self.pcolor(package), pkgid])
-            if package.is_peak and not package.is_confirmed:
-                self.peak_liststore.append([package.pkg.get_fullname(True), self.pcolor(package), pkgid])
+            package.update_rows()
         self.perform_remove.set_sensitive(False)
 
     def init_gui_objects(self):
