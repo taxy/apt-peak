@@ -46,29 +46,17 @@ class GPeak (object):
             return "#880000"
         return "#000000"
 
-
-    def update_confirmed_list(self):
+    def update_lists(self):
         self.confirmed_liststore.clear()
+        self.peak_liststore.clear()
+        self.removable_liststore.clear()
         for pkgid, package in self.packages.items():
             if package.is_confirmed:
                 self.confirmed_liststore.append([package.pkg.get_fullname(True), self.pcolor(package), pkgid])
-
-    def update_peak_list(self):
-        self.peak_liststore.clear()
-        for pkgid, package in self.packages.items():
-            if package.is_peak and not package.is_confirmed:
-                self.peak_liststore.append([package.pkg.get_fullname(True), self.pcolor(package), pkgid])
-
-    def update_removable_list(self):
-        self.removable_liststore.clear()
-        for pkgid, package in self.packages.items():
             if package.is_removable:
                 self.removable_liststore.append([package.pkg.get_fullname(True), self.pcolor(package), pkgid])
-
-    def update_lists(self):
-        self.update_confirmed_list()
-        self.update_peak_list()
-        self.update_removable_list()
+            if package.is_peak and not package.is_confirmed:
+                self.peak_liststore.append([package.pkg.get_fullname(True), self.pcolor(package), pkgid])
         self.perform_remove.set_sensitive(False)
 
     def init_gui_objects(self):
