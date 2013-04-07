@@ -103,7 +103,6 @@ class GPeak (object):
     def update_lists(self):
         for pkgid, package in self.packages.items():
             package.update_rows()
-        self.perform_remove.set_sensitive(False)
 
     def init_gui_objects(self):
         self.confirmed = self.builder.get_object("confirmed")
@@ -150,31 +149,37 @@ class GPeak (object):
             conf_value = True
 
         treemodel, paths = treeview.get_selection().get_selected_rows()
+        treerows = list()
         for path in paths:
+            treerows.append(gtk.TreeRowReference(treemodel, path))
+        for treerow in treerows:
+            path = treerow.get_path()
             package = self.packages[treemodel[path][2]]
             self.confirm_package(package, conf_value)
-        self.update_lists()
+            package.update_rows()
+        self.perform_remove.set_sensitive(False)
 
     def remove(self, *args):
         treemodel, paths = self.peak.get_selection().get_selected_rows()
         for path in paths:
             package = self.packages[treemodel[path][2]]
             package.is_removable = True
-        self.update_lists()
+            package.update_rows()
+        self.perform_remove.set_sensitive(False)
 
     def clear_removables(self, *args):
         not_peak = list()
 
         for pkgid, package in self.packages.items():
             if package.is_removable:
-                if package.is_peak:
-                    package.is_removable = False
-                else:
+                package.is_removable = False
+                package.update_rows()
+                if not package.is_peak:
                     not_peak.append(pkgid)
 
         for pkgid in not_peak:
             self.packages.pop(pkgid)
-        self.update_lists()
+        self.perform_remove.set_sensitive(False)
 
 
     def add_confirm_set(self):
@@ -205,6 +210,8 @@ class GPeak (object):
                 if package.is_peak:
                     remove.append(package.pkg)
                 else:
+                    package.is_removable = False
+                    package.update_rows()
                     not_peak.append(pkgid)
             if package.is_confirmed:
                     keep.append(package.pkg)
@@ -213,7 +220,7 @@ class GPeak (object):
             self.packages.pop(pkgid)
 
         if len(remove) == 0:
-            self.update_lists()
+            self.perform_remove.set_sensitive(False)
             return
         removable = list()
         peak_tree.get_peak_tree(remove, keep, removable)
@@ -224,10 +231,13 @@ class GPeak (object):
             else:
                 package = Package(self, pkg)
             package.is_removable = True
-        self.update_lists()
+            package.update_rows()
         self.perform_remove.set_sensitive(True)
 
     def refresh(self, *args):
+        self.confirmed_liststore.clear()
+        self.removable_liststore.clear()
+        self.peak_liststore.clear()
         self.packages = dict()
         self.cache = apt_pkg.Cache()
         print("Search peak packages...", end="")
@@ -239,6 +249,7 @@ class GPeak (object):
         self.add_confirm_set()
 
         self.update_lists()
+        self.perform_remove.set_sensitive(False)
 
     def run(self):
         self.builder.get_object("gapt_peak").show_all()
