@@ -11,12 +11,13 @@ from peak_common import Peak
 from peak_common import Peak_tree
 
 class Package:
-    def __init__(self, pkg_dict, pkg):
+    def __init__(self, gpeak, pkg):
         self.pkg = pkg
         self.is_peak = False
         self.is_confirmed = False
         self.is_removable = False
-        pkg_dict[pkg.id] = self
+        self.gpeak = gpeak
+        gpeak.packages[pkg.id] = self
 
 class GPeak (object):
 
@@ -34,7 +35,7 @@ class GPeak (object):
 
         for otherpkg in self.cache.packages:
             if peak.is_peak(otherpkg):
-                package = Package(self.packages, otherpkg)
+                package = Package(self, otherpkg)
                 package.is_peak = True
 
     def pcolor(self, package):
@@ -139,7 +140,7 @@ class GPeak (object):
                 if pkg.id in self.packages:
                     package = self.packages[pkg.id]
                 else:
-                    package = Package(self.packages, pkg)
+                    package = Package(self, pkg)
                 package.is_confirmed = True
 
             except KeyError as e:
@@ -176,7 +177,7 @@ class GPeak (object):
             if pkg.id in self.packages:
                 package = self.packages[pkg.id]
             else:
-                package = Package(self.packages, pkg)
+                package = Package(self, pkg)
             package.is_removable = True
         self.update_lists()
         self.perform_remove.set_sensitive(True)
