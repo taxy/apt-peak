@@ -124,15 +124,18 @@ class GPeak (object):
     def confirm(self, *args):
         conf_value = False
         treeview = None
-        if args[0].get_label() == "<< Confirm":
+        bname = gtk.Buildable.get_name(args[0])
+        if bname == "confirm_button":
             treeview = self.peak
             conf_value = True
-        if args[0].get_label() == "Unconfirm >>":
+        elif bname == "unconfirm_button":
             treeview = self.confirmed
             conf_value = False
-        if args[0].get_label() == "Move to confirmed >>":
+        elif bname == "keep":
             treeview = self.removable
             conf_value = True
+        else:
+            return
 
         treemodel, paths = treeview.get_selection().get_selected_rows()
         treerows = list()
