@@ -110,6 +110,7 @@ class GPeak (object):
         self.removable_liststore.set_sort_column_id(0, gtk.SORT_ASCENDING)
 
         self.perform_remove = self.builder.get_object("perform_remove")
+        self.short = self.builder.get_object("short")
 
     def confirm_package(self, package, conf_value):
         package.is_confirmed = conf_value
@@ -229,6 +230,7 @@ class GPeak (object):
         self.peak_liststore.clear()
         self.packages = dict()
         self.cache = apt_pkg.Cache()
+        self.records = apt_pkg.PackageRecords(self.cache)
         print("Search peak packages...", end="")
         sys.stdout.flush()
         self.list_orphans()
@@ -239,6 +241,15 @@ class GPeak (object):
 
         self.update_lists()
         self.perform_remove.set_sensitive(False)
+
+    def set_description(self, *args):
+        treeview = args[0]
+        liststore = treeview.get_model()
+        path, column = treeview.get_cursor()
+        pkg = self.packages[liststore[path][2]].pkg
+        if pkg.current_ver != None:
+            self.records.Lookup(pkg.current_ver.file_list[0])
+            self.short.set_text(self.records.short_desc)
 
     def run(self):
         self.builder.get_object("gapt_peak").show_all()
